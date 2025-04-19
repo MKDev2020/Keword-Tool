@@ -18,11 +18,12 @@ function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// Keyword highlighting
 function highlightText() {
-  const article = document.getElementById("articleText").value;  // Match with HTML ID
-  const mainKws = document.getElementById("mainKws").value.trim().split("\n").filter(Boolean);  // Match with HTML ID
-  const lsiKws = document.getElementById("lsiKws").value.trim().split("\n").filter(Boolean);  // Match with HTML ID
-  const sectionKws = document.getElementById("sectionKws").value.trim().split("\n").filter(Boolean);  // Match with HTML ID
+  const article = document.getElementById("articleInput").value;
+  const mainKws = document.getElementById("mainKeywords").value.trim().split("\n").filter(Boolean);
+  const lsiKws = document.getElementById("lsiKeywords").value.trim().split("\n").filter(Boolean);
+  const sectionKws = document.getElementById("sectionKeywords").value.trim().split("\n").filter(Boolean);
 
   let output = article;
 
@@ -55,11 +56,11 @@ function highlightText() {
   renderLegend(allKeywords);
 }
 
+// Rendering Keyword Legend
 function renderLegend(keywords) {
   const legendContainer = document.getElementById("legend");
   legendContainer.innerHTML = "";
 
-  // Remove duplicates
   const unique = [];
   keywords.forEach(({ type, kw, color }) => {
     if (!unique.find(k => k.kw === kw)) {
@@ -67,7 +68,6 @@ function renderLegend(keywords) {
     }
   });
 
-  // Sort by type: Main → LSI → Section
   const typeOrder = { "Main": 0, "LSI": 1, "Section": 2 };
   unique.sort((a, b) => typeOrder[a.type] - typeOrder[b.type]);
 
@@ -89,6 +89,7 @@ function renderLegend(keywords) {
   });
 }
 
+// Copy to Clipboard
 function copyToClipboard() {
   const el = document.createElement("textarea");
   el.value = document.getElementById("output").innerHTML;
@@ -99,6 +100,45 @@ function copyToClipboard() {
   alert("HTML copied! Paste into a Google Doc using Ctrl+Shift+V for clean formatting.");
 }
 
-// Add event listeners for button clicks
-document.getElementById("highlightBtn").addEventListener("click", highlightText);
-document.getElementById("copyBtn").addEventListener("click", copyToClipboard);
+// Text Formatting Functions
+function setTextBold() {
+  document.execCommand("bold");
+}
+
+function setTextItalic() {
+  document.execCommand("italic");
+}
+
+function setTextUnderline() {
+  document.execCommand("underline");
+}
+
+function increaseFontSize() {
+  const article = document.getElementById("articleInput");
+  const style = window.getComputedStyle(article);
+  const currentSize = parseInt(style.fontSize, 10);
+  article.style.fontSize = (currentSize + 1) + "px";
+}
+
+function decreaseFontSize() {
+  const article = document.getElementById("articleInput");
+  const style = window.getComputedStyle(article);
+  const currentSize = parseInt(style.fontSize, 10);
+  article.style.fontSize = (currentSize - 1) + "px";
+}
+
+function setFontSize(fontSize) {
+  document.getElementById("articleInput").style.fontSize = fontSize + "px";
+}
+
+function setFontFamily(font) {
+  document.getElementById("articleInput").style.fontFamily = font;
+}
+
+function setTextColor(color) {
+  document.getElementById("articleInput").style.color = color;
+}
+
+function setTextHighlight(color) {
+  document.getElementById("articleInput").style.backgroundColor = color;
+}
