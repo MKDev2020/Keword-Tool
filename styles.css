@@ -1,4 +1,3 @@
-/* Base styling */
 body {
   font-family: Arial, sans-serif;
   margin: 2rem;
@@ -7,7 +6,6 @@ body {
 
 h1 {
   color: #222;
-  text-align: center;
 }
 
 textarea, input, button {
@@ -39,7 +37,6 @@ textarea {
   margin: 0 3px;
 }
 
-/* Summary Table */
 .summary-table {
   margin-top: 20px;
   border-collapse: collapse;
@@ -66,9 +63,8 @@ textarea {
   height: 200px; /* Bigger box */
 }
 
-/* Button Styling (default to light grey) */
 button {
-  background-color: #d3d3d3; /* Light Grey */
+  background-color: #c0c0c0; /* Shiny Silver */
   color: white;
   border: none;
   cursor: pointer;
@@ -76,27 +72,12 @@ button {
 }
 
 button:hover {
-  background-color: #45a049; /* Green for Run Button */
+  background-color: #45a049; /* Green hover for Run button */
 }
 
-button#copyButton:hover {
-  background-color: #9b59b6; /* Purple for Copy to Clipboard Button */
-}
-
-/* Keyword Box Colors (Shaded) */
-#tableKeywords-box textarea {
-  background-color: #FFFF00;  /* Yellow */
-  color: #222;
-}
-
-#lsiKeywords-box textarea {
-  background-color: #98C7E4;  /* Light Blue */
-  color: #222;
-}
-
-#sectionKeywords-box textarea {
-  background-color: #D1F7A1;  /* Light Green */
-  color: #222;
+/* Copy to Clipboard Button Hover */
+#copyButton:hover {
+  background-color: #800080; /* Purple hover for Copy to Clipboard button */
 }
 
 h2 {
@@ -108,19 +89,15 @@ h2 {
   background-color: #f2f2f2;
 }
 
-button#runButton {
-  background-color: #d3d3d3; /* Light Grey */
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
+/* Add styling for each keyword type's color */
+#tableKeywords {
+  background-color: #FFD700;  /* Yellow */
 }
 
-button#copyButton {
-  background-color: #d3d3d3; /* Light Grey */
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  margin-top: 10px;
+#lsiKeywords {
+  background-color: #98C7E4;  /* Light Blue */
+}
+
+#sectionKeywords {
+  background-color: #D1F7A1;  /* Light Green */
 }
