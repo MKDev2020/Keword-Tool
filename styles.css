@@ -22,6 +22,17 @@ textarea, input, button {
 textarea {
   font-family: Arial, sans-serif;
   font-size: 16px;
+  resize: none; /* Disable resizing */
+}
+
+/* Article Box - Largest */
+#article {
+  height: 400px; /* Increase height for article box */
+}
+
+/* Smaller Keyword Boxes */
+#tableKeywords, #lsiKeywords, #sectionKeywords {
+  height: 150px; /* Make keyword boxes smaller */
 }
 
 #output {
