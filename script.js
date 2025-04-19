@@ -18,7 +18,6 @@ function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// Keyword highlighting
 function highlightText() {
   const article = document.getElementById("articleInput").value;
   const mainKws = document.getElementById("mainKeywords").value.trim().split("\n").filter(Boolean);
@@ -56,11 +55,11 @@ function highlightText() {
   renderLegend(allKeywords);
 }
 
-// Rendering Keyword Legend
 function renderLegend(keywords) {
   const legendContainer = document.getElementById("legend");
   legendContainer.innerHTML = "";
 
+  // Remove duplicates
   const unique = [];
   keywords.forEach(({ type, kw, color }) => {
     if (!unique.find(k => k.kw === kw)) {
@@ -68,6 +67,7 @@ function renderLegend(keywords) {
     }
   });
 
+  // Sort by type: Main → LSI → Section
   const typeOrder = { "Main": 0, "LSI": 1, "Section": 2 };
   unique.sort((a, b) => typeOrder[a.type] - typeOrder[b.type]);
 
@@ -89,7 +89,7 @@ function renderLegend(keywords) {
   });
 }
 
-// Copy to Clipboard
+// Copy text to clipboard
 function copyToClipboard() {
   const el = document.createElement("textarea");
   el.value = document.getElementById("output").innerHTML;
@@ -100,45 +100,53 @@ function copyToClipboard() {
   alert("HTML copied! Paste into a Google Doc using Ctrl+Shift+V for clean formatting.");
 }
 
-// Text Formatting Functions
-function setTextBold() {
-  document.execCommand("bold");
+// Bold, Italic, Underline, Font Size, Font Family, etc.
+function applyFormat(command) {
+  document.execCommand(command, false, null);
 }
 
-function setTextItalic() {
-  document.execCommand("italic");
-}
+// Font Size Increase/Decrease
+function changeFontSize(action) {
+  let fontSize = window.getComputedStyle(document.getElementById('articleInput')).fontSize;
+  fontSize = parseInt(fontSize, 10);
 
-function setTextUnderline() {
-  document.execCommand("underline");
-}
+  if (action === "increase" && fontSize < 24) {
+    fontSize += 1;
+  } else if (action === "decrease" && fontSize > 10) {
+    fontSize -= 1;
+  }
 
-function increaseFontSize() {
-  const article = document.getElementById("articleInput");
-  const style = window.getComputedStyle(article);
-  const currentSize = parseInt(style.fontSize, 10);
-  article.style.fontSize = (currentSize + 1) + "px";
-}
-
-function decreaseFontSize() {
-  const article = document.getElementById("articleInput");
-  const style = window.getComputedStyle(article);
-  const currentSize = parseInt(style.fontSize, 10);
-  article.style.fontSize = (currentSize - 1) + "px";
-}
-
-function setFontSize(fontSize) {
   document.getElementById("articleInput").style.fontSize = fontSize + "px";
 }
 
+// Set Font Family
 function setFontFamily(font) {
   document.getElementById("articleInput").style.fontFamily = font;
 }
 
+// Set Font Size from Dropdown
+function setFontSize(size) {
+  document.getElementById("articleInput").style.fontSize = size + "px";
+}
+
+// Set Text Color
 function setTextColor(color) {
   document.getElementById("articleInput").style.color = color;
 }
 
-function setTextHighlight(color) {
+// Set Background Color
+function setBackgroundColor(color) {
   document.getElementById("articleInput").style.backgroundColor = color;
 }
+
+// Add event listeners for buttons
+document.getElementById("boldBtn").addEventListener("click", () => applyFormat("bold"));
+document.getElementById("italicBtn").addEventListener("click", () => applyFormat("italic"));
+document.getElementById("underlineBtn").addEventListener("click", () => applyFormat("underline"));
+document.getElementById("increaseFontBtn").addEventListener("click", () => changeFontSize("increase"));
+document.getElementById("decreaseFontBtn").addEventListener("click", () => changeFontSize("decrease"));
+document.getElementById("fontSelect").addEventListener("change", (e) => setFontFamily(e.target.value));
+document.getElementById("fontSizeSelect").addEventListener("change", (e) => setFontSize(e.target.value));
+document.getElementById("textColorSelect").addEventListener("change", (e) => setTextColor(e.target.value));
+document.getElementById("bgColorSelect").addEventListener("change", (e) => setBackgroundColor(e.target.value));
+
