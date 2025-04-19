@@ -19,7 +19,14 @@
     textarea, input, button {
       width: 100%;
       margin: 10px 0;
-      padding: 10px;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    textarea {
+      font-family: Arial, sans-serif;
       font-size: 16px;
     }
 
@@ -35,16 +42,19 @@
       padding: 2px 4px;
       border-radius: 4px;
       font-weight: bold;
+      margin: 0 3px;
     }
 
     .summary-table {
       margin-top: 20px;
       border-collapse: collapse;
+      width: 100%;
     }
 
     .summary-table th, .summary-table td {
       border: 1px solid #ccc;
-      padding: 8px;
+      padding: 10px;
+      text-align: left;
     }
 
     .color-box {
@@ -55,98 +65,178 @@
       vertical-align: middle;
       border-radius: 2px;
     }
+
+    /* Larger text areas */
+    textarea {
+      height: 200px; /* Bigger box */
+    }
+
+    button {
+      background-color: #4CAF50; /* Green */
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #444;
+    }
+
+    .summary-table th {
+      background-color: #f2f2f2;
+    }
+
+    /* Add styling for each keyword type's color */
+    #tableKeywords {
+      background-color: #FFD700;  /* Gold */
+      color: #222;
+    }
+
+    #lsiKeywords {
+      background-color: #98C7E4;  /* Light Blue */
+      color: #222;
+    }
+
+    #sectionKeywords {
+      background-color: #D1F7A1;  /* Light Green */
+      color: #222;
+    }
+
+    button#copyButton:hover {
+      background-color: #9b59b6; /* Purple */
+    }
   </style>
 </head>
 <body>
   <h1>Keyword Tool by MK</h1>
-
   <label>Paste your article here:</label>
   <textarea id="article" rows="10"></textarea>
-  <button onclick="copyToClipboard('article')">Copy to Clipboard</button>
 
-  <label>Enter table keywords (one per line):</label>
-  <textarea id="tableKeywords" rows="4"></textarea>
+  <label>Enter Table Keywords (Highlighted in Gold):</label>
+  <textarea id="tableKeywords" rows="3"></textarea>
 
-  <label>Enter section keywords (one per line):</label>
-  <textarea id="sectionKeywords" rows="4"></textarea>
+  <label>Enter LSI Keywords (Highlighted in Light Blue):</label>
+  <textarea id="lsiKeywords" rows="3"></textarea>
 
-  <label>Enter LSI keywords (one per line):</label>
-  <textarea id="lsiKeywords" rows="4"></textarea>
+  <label>Enter Section Keywords (Highlighted in Light Green):</label>
+  <textarea id="sectionKeywords" rows="3"></textarea>
 
   <button onclick="highlightKeywords()">Run</button>
 
+  <button id="copyButton" onclick="copyToClipboard()">Copy to Clipboard</button>
+
   <h2>Highlighted Article</h2>
   <div id="output"></div>
-  <button onclick="copyToClipboard('output')">Copy to Clipboard</button>
 
   <h2>Keyword Summary</h2>
   <table class="summary-table" id="summary"></table>
 
   <script>
-    function copyToClipboard(id) {
-      const text = document.getElementById(id).innerText || document.getElementById(id).value;
-      navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard'));
-    }
-
     function highlightKeywords() {
       const article = document.getElementById('article').value;
-      const getKeywords = id => document.getElementById(id).value
+      const tableKeywords = document.getElementById('tableKeywords').value
         .split('\n')
         .map(k => k.trim().toLowerCase())
         .filter(k => k);
 
-      const rawKeywords = [
-        ...getKeywords('tableKeywords'),
-        ...getKeywords('sectionKeywords'),
-        ...getKeywords('lsiKeywords')
-      ];
+      const lsiKeywords = document.getElementById('lsiKeywords').value
+        .split('\n')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k);
 
-      const sortedKeywords = [...rawKeywords].sort((a, b) => b.length - a.length);
-      const keywordColors = {};
-      const summary = {};
-      const placeholders = [];
+      const sectionKeywords = document.getElementById('sectionKeywords').value
+        .split('\n')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k);
 
-      function getRandomColor() {
-        const hue = Math.floor(Math.random() * 360);
-        return `hsl(${hue}, 80%, 80%)`;
+      // Define specific colors for each type of keyword list
+      const keywordColors = {
+        table: '#FFD700',  // Gold for Table Keywords
+        lsi: '#98C7E4',    // Light Blue for LSI Keywords
+        section: '#D1F7A1' // Light Green for Section Keywords
+      };
+
+      const summary = {
+        table: {},
+        lsi: {},
+        section: {}
+      };
+
+      function highlightKeyword(kw, color) {
+        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+        return (text) => {
+          return text.replace(pattern, `<span class="keyword" style="background-color:${color}">${kw}</span>`);
+        };
       }
 
       let workingText = ` ${article} `;
+      let highlightedText = workingText;
 
-      for (let i = 0; i < sortedKeywords.length; i++) {
-        const kw = sortedKeywords[i];
-        const color = getRandomColor();
-        keywordColors[kw] = color;
+      // Highlight table keywords
+      tableKeywords.forEach(kw => {
+        highlightedText = highlightKeyword(kw, keywordColors.table)(highlightedText);
+        summary.table[kw] = (summary.table[kw] || 0) + 1;
+      });
 
-        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
-        let match;
+      // Highlight LSI keywords
+      lsiKeywords.forEach(kw => {
+        highlightedText = highlightKeyword(kw, keywordColors.lsi)(highlightedText);
+        summary.lsi[kw] = (summary.lsi[kw] || 0) + 1;
+      });
 
-        while ((match = pattern.exec(workingText)) !== null) {
-          const placeholder = `{{kw${placeholders.length}}}`;
-          placeholders.push({ placeholder, keyword: match[0], color, original: match[0], start: match.index });
-          workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
-          pattern.lastIndex = match.index + placeholder.length;
-          summary[kw] = (summary[kw] || 0) + 1;
-        }
+      // Highlight section-specific keywords
+      sectionKeywords.forEach(kw => {
+        highlightedText = highlightKeyword(kw, keywordColors.section)(highlightedText);
+        summary.section[kw] = (summary.section[kw] || 0) + 1;
+      });
+
+      // Display highlighted article
+      document.getElementById('output').innerHTML = highlightedText.trim();
+
+      // Build the summary table
+      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th><th>Type</th></tr>";
+
+      function buildSummaryRow(kw, count, color, type) {
+        return `<tr>
+                  <td>${kw}</td>
+                  <td>${count}</td>
+                  <td><span class="color-box" style="background:${color}"></span></td>
+                  <td>${type}</td>
+                </tr>`;
       }
 
-      placeholders.sort((a, b) => a.start - b.start);
-      for (let p of placeholders) {
-        workingText = workingText.replace(
-          p.placeholder,
-          `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`
-        );
+      // Add table keyword rows
+      for (let kw in summary.table) {
+        tableHTML += buildSummaryRow(kw, summary.table[kw], keywordColors.table, 'Table Keyword');
       }
 
-      document.getElementById('output').innerHTML = workingText.trim();
-
-      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
-      for (let kw of sortedKeywords) {
-        const count = summary[kw] || 0;
-        const color = keywordColors[kw] || "#eee";
-        tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+      // Add LSI keyword rows
+      for (let kw in summary.lsi) {
+        tableHTML += buildSummaryRow(kw, summary.lsi[kw], keywordColors.lsi, 'LSI Keyword');
       }
+
+      // Add section keyword rows
+      for (let kw in summary.section) {
+        tableHTML += buildSummaryRow(kw, summary.section[kw], keywordColors.section, 'Section Keyword');
+      }
+
       document.getElementById('summary').innerHTML = tableHTML;
+    }
+
+    function copyToClipboard() {
+      const outputText = document.getElementById('output').innerText;
+      const textArea = document.createElement('textarea');
+      textArea.value = outputText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
     }
   </script>
 </body>
