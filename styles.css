@@ -1,3 +1,4 @@
+/* General Body Styles */
 body {
   font-family: Arial, sans-serif;
   margin: 2rem;
@@ -8,6 +9,7 @@ h1 {
   color: #222;
 }
 
+/* Textarea and Input Styles */
 textarea, input, button {
   width: 100%;
   margin: 10px 0;
@@ -30,6 +32,7 @@ textarea {
   white-space: pre-wrap;
 }
 
+/* Keyword Box Styles */
 .keyword {
   padding: 2px 4px;
   border-radius: 4px;
@@ -37,6 +40,43 @@ textarea {
   margin: 0 3px;
 }
 
+/* Button Styles */
+button {
+  background-color: #C0C0C0;  /* Shiny Silver for static color */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease; /* Smooth transition for hover */
+}
+
+button#runBtn:hover {
+  background-color: #45a049;  /* Green for Run button hover */
+}
+
+button#copyBtn:hover {
+  background-color: #800080;  /* Purple for Copy to Clipboard button hover */
+}
+
+button:focus {
+  outline: none;
+}
+
+/* Section Styles for each Keyword */
+#tableKeywords {
+  background-color: #FFD700;  /* Yellow */
+}
+
+#lsiKeywords {
+  background-color: #98C7E4;  /* Light Blue */
+}
+
+#sectionKeywords {
+  background-color: #D1F7A1;  /* Light Green */
+}
+
+/* Summary Table Styles */
 .summary-table {
   margin-top: 20px;
   border-collapse: collapse;
@@ -47,6 +87,10 @@ textarea {
   border: 1px solid #ccc;
   padding: 10px;
   text-align: left;
+}
+
+.summary-table th {
+  background-color: #f2f2f2;
 }
 
 .color-box {
@@ -61,43 +105,4 @@ textarea {
 /* Larger text areas */
 textarea {
   height: 200px; /* Bigger box */
-}
-
-button {
-  background-color: #c0c0c0; /* Shiny Silver */
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-}
-
-button:hover {
-  background-color: #45a049; /* Green hover for Run button */
-}
-
-/* Copy to Clipboard Button Hover */
-#copyButton:hover {
-  background-color: #800080; /* Purple hover for Copy to Clipboard button */
-}
-
-h2 {
-  margin-top: 30px;
-  color: #444;
-}
-
-.summary-table th {
-  background-color: #f2f2f2;
-}
-
-/* Add styling for each keyword type's color */
-#tableKeywords {
-  background-color: #FFD700;  /* Yellow */
-}
-
-#lsiKeywords {
-  background-color: #98C7E4;  /* Light Blue */
-}
-
-#sectionKeywords {
-  background-color: #D1F7A1;  /* Light Green */
 }
