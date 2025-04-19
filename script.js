@@ -29,14 +29,8 @@ function highlightKeywords() {
     section: {}
   };
 
-  function escapeRegExp(string) {
-    // Escape any special characters that could break the regex
-    return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
-  }
-
   function highlightKeyword(kw, color) {
-    const escapedKeyword = escapeRegExp(kw);
-    const pattern = new RegExp(`(?<!\\w)${escapedKeyword}(?!\\w)`, 'gi');
+    const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
     return (text) => {
       return text.replace(pattern, `<span class="keyword" style="background-color:${color}">${kw}</span>`);
     };
