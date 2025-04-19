@@ -1,143 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Keyword Highlighter Tool</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyword Highlighter</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      background: #f9f9f9;
-    }
-
-    h1 {
-      color: #222;
-    }
-
-    textarea, input, button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 16px;
-    }
-
-    #output {
-      border: 1px solid #ccc;
-      background: #fff;
-      padding: 1rem;
-      margin-top: 20px;
-      white-space: pre-wrap;
-    }
-
-    .keyword {
-      padding: 2px 4px;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-
-    .summary-table {
-      margin-top: 20px;
-      border-collapse: collapse;
-    }
-
-    .summary-table th, .summary-table td {
-      border: 1px solid #ccc;
-      padding: 8px;
-    }
-
-    .color-box {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      margin-right: 6px;
-      vertical-align: middle;
-      border-radius: 2px;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
+    textarea, input, button { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 16px; }
+    #output { padding: 15px; border: 1px solid #ccc; min-height: 150px; white-space: pre-wrap; }
+    .highlight { padding: 2px 4px; border-radius: 4px; color: #000; }
+    #legend { margin-top: 20px; }
+    .legend-item { margin-bottom: 5px; display: inline-block; margin-right: 10px; padding: 4px 8px; border-radius: 4px; color: #000; }
+    #summary { margin-top: 30px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
   </style>
 </head>
 <body>
   <h1>Keyword Highlighter Tool</h1>
-  <label>Paste your article here:</label>
+  <label for="article">Paste your article:</label>
   <textarea id="article" rows="10"></textarea>
 
-  <label>Enter keywords (one per line):</label>
-  <textarea id="keywords" rows="6"></textarea>
+  <label for="keywords">Enter keywords (one per line):</label>
+  <textarea id="keywords" rows="5"></textarea>
 
   <button onclick="highlightKeywords()">Highlight Keywords</button>
 
-  <h2>Highlighted Article</h2>
   <div id="output"></div>
 
-  <h2>Keyword Summary</h2>
-  <table class="summary-table" id="summary"></table>
+  <div id="legend"></div>
+
+  <div id="summary">
+    <h2>Keyword Summary</h2>
+    <table>
+      <thead>
+        <tr><th>Keyword</th><th>Count</th></tr>
+      </thead>
+      <tbody id="summary-body"></tbody>
+    </table>
+  </div>
 
   <script>
+    function generateDistinctColors(n) {
+      const colors = [];
+      const hueStep = 360 / n;
+      for (let i = 0; i < n; i++) {
+        const hue = Math.floor(i * hueStep);
+        const saturation = 70 + Math.random() * 20; // 70–90%
+        const lightness = 45 + Math.random() * 10;  // 45–55%
+        colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
+      }
+      return colors;
+    }
+
     function highlightKeywords() {
-      const article = document.getElementById('article').value;
-      const rawKeywords = document.getElementById('keywords').value
+      const articleText = document.getElementById('article').value.toLowerCase();
+      let keywords = document.getElementById('keywords').value
         .split('\n')
         .map(k => k.trim().toLowerCase())
         .filter(k => k);
 
-      const sortedKeywords = [...rawKeywords].sort((a, b) => b.length - a.length);
-      const usedSpans = [];
-      const keywordColors = {};
+      // Sort keywords by length (longest first to avoid overlaps)
+      keywords.sort((a, b) => b.length - a.length);
+
+      const colors = generateDistinctColors(keywords.length);
+      const colorMap = {};
       const summary = {};
+      let workingText = ` ${articleText} `; // Padding to help match boundaries
 
-      function getRandomColor() {
-        const hue = Math.floor(Math.random() * 360);
-        return `hsl(${hue}, 80%, 80%)`;
-      }
+      for (let i = 0; i < keywords.length; i++) {
+        const keyword = keywords[i];
+        const color = colors[i];
+        colorMap[keyword] = color;
 
-      let workingText = ` ${article} `;
-      const placeholders = [];
+        const pattern = new RegExp(`(?<!\\w)${keyword.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}(?!\\w)`, 'gi');
+        const matches = [...workingText.matchAll(pattern)];
 
-      for (let i = 0; i < sortedKeywords.length; i++) {
-        const kw = sortedKeywords[i];
-        const color = getRandomColor();
-        keywordColors[kw] = color;
+        summary[keyword] = matches.length;
 
-        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
-        let match;
-
-        while ((match = pattern.exec(workingText)) !== null) {
-          const placeholder = `{{kw${placeholders.length}}}`;
-          placeholders.push({
-            placeholder,
-            keyword: match[0],
-            color,
-            original: match[0],
-            start: match.index
-          });
-
-          workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
-          pattern.lastIndex = match.index + placeholder.length;
-
-          summary[kw] = (summary[kw] || 0) + 1;
-        }
-      }
-
-      // Replace placeholders with spans
-      placeholders.sort((a, b) => a.start - b.start);
-      for (let p of placeholders) {
-        workingText = workingText.replace(
-          p.placeholder,
-          `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`
-        );
+        workingText = workingText.replace(pattern, match => {
+          return `<span class="highlight" style="background-color:${color};">${match}</span>`;
+        });
       }
 
       document.getElementById('output').innerHTML = workingText.trim();
 
-      // Build summary table
-      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
-      for (let kw of rawKeywords) {
-        const count = summary[kw] || 0;
-        const color = keywordColors[kw] || "#eee";
-        tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+      // Legend
+      let legendHTML = '<h3>Keyword Legend</h3>';
+      for (const keyword of keywords) {
+        legendHTML += `<div class="legend-item" style="background-color:${colorMap[keyword]};">${keyword}</div>`;
       }
+      document.getElementById('legend').innerHTML = legendHTML;
 
-      document.getElementById('summary').innerHTML = tableHTML;
+      // Summary Table
+      let summaryHTML = '';
+      for (const keyword of keywords) {
+        summaryHTML += `<tr><td>${keyword}</td><td>${summary[keyword]}</td></tr>`;
+      }
+      document.getElementById('summary-body').innerHTML = summaryHTML;
     }
   </script>
 </body>
