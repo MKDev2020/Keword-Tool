@@ -1,5 +1,6 @@
 let keywordCounts = {};  // Declare global variable for keyword counts
 
+// Highlight keywords and display counts when "Run" button is clicked
 function highlightKeywords() {
   const article = document.getElementById('article').value;
   const tableKeywords = document.getElementById('tableKeywords').value.split('\n').map(kw => kw.trim());
