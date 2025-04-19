@@ -1,9 +1,9 @@
 document.getElementById("analyzeBtn").addEventListener("click", function() {
     // Get the input article text and keywords
     let articleText = document.getElementById("articleInput").value;
-    let tableKW = document.getElementById("tableKW").value.split("\n");
-    let lsiKW = document.getElementById("lsiKW").value.split("\n");
-    let sectionKW = document.getElementById("sectionKW").value.split("\n");
+    let tableKW = document.getElementById("tableKW").value.split("\n").filter(kw => kw.trim() !== "");
+    let lsiKW = document.getElementById("lsiKW").value.split("\n").filter(kw => kw.trim() !== "");
+    let sectionKW = document.getElementById("sectionKW").value.split("\n").filter(kw => kw.trim() !== "");
 
     // Function to count occurrences of a keyword (non-overlapping)
     function countOccurrences(text, keyword) {
@@ -37,8 +37,7 @@ document.getElementById("analyzeBtn").addEventListener("click", function() {
 
     // Update the keyword density
     let totalWords = articleText.split(/\s+/).length;
-    let totalKeywords = tableKW.concat(lsiKW, sectionKW);
-    let totalKWCount = totalKeywords.reduce((acc, kw) => acc + countOccurrences(articleText, kw), 0);
+    let totalKWCount = tableKW.concat(lsiKW, sectionKW).reduce((acc, kw) => acc + countOccurrences(articleText, kw), 0);
     let density = ((totalKWCount / totalWords) * 100).toFixed(2);
     document.getElementById("kwResult").innerHTML += `<p>Keyword Density: ${density}%</p>`;
 });
