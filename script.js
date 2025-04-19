@@ -8,17 +8,24 @@ function highlightKeywords() {
   const allKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
   
   let output = article;
-  
-  // Count and highlight keywords
   const keywordCounts = {};
 
+  // Count and highlight keywords, ensure non-overlapping matches
   allKeywords.forEach(keyword => {
     if (keyword !== "") {
+      // Create a non-overlapping regular expression match
       const keywordRegex = new RegExp(`\\b${keyword}\\b`, "g");
-      const count = (article.match(keywordRegex) || []).length;
+      const matches = [...article.matchAll(keywordRegex)]; // Use matchAll to get all matches
+      
+      // Count the number of matches (this gives the correct count for non-overlapping instances)
+      const count = matches.length;
       keywordCounts[keyword] = count;
-      const highlightedKeyword = `<span class="keyword" style="background-color: ${getColorForKeyword(keyword)};">${keyword}</span>`;
-      output = output.replace(new RegExp(`\\b${keyword}\\b`, "g"), highlightedKeyword);
+
+      // Highlight each instance in the output, ensuring no overlap
+      matches.forEach(match => {
+        const highlightedKeyword = `<span class="keyword" style="background-color: ${getColorForKeyword(keyword)};">${match[0]}</span>`;
+        output = output.replace(match[0], highlightedKeyword);
+      });
     }
   });
 
@@ -48,6 +55,7 @@ function highlightKeywords() {
     }
   });
 }
+
 
 function getColorForKeyword(keyword) {
   const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(keyword => keyword.trim().toLowerCase());
