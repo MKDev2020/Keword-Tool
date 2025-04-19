@@ -8,105 +8,12 @@ body {
 
 .container {
   width: 90%;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* Text Areas */
-textarea, input[type="text"] {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  background-color: white;
-  resize: vertical;
-}
-
-#articleInput {
-  height: 300px;
-}
-
-#output {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: white;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-/* Buttons */
-button {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin: 5px 3px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-button:hover {
-  background-color: #2980b9;
-}
-
-button:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
-}
-
-/* Keyword Input Groups */
-.keyword-box {
-  margin-bottom: 15px;
-}
-
-.keyword-box label {
-  font-weight: bold;
-}
-
-.keyword-box textarea {
-  height: 100px;
-  font-size: 14px;
-}
-
-/* Highlight Classes */
-.highlight-yellow {
-  background-color: yellow;
-  font-weight: bold;
-}
-
-.highlight-purple {
-  background-color: #d8bfe7;
-  font-weight: bold;
-}
-
-.bold-only {
-  font-weight: bold;
-}
-
-/* Font Formatting */
-#textFormattingButtons {
-  margin: 20px 0;
-}
-
-select, .font-size-btn {
-  padding: 5px;
-  margin: 5px;
-  font-size: 14px;
-  border-radius: 5px;
-}
-
-select {
-  width: 120px;
-}
-
-/* Font Sizes */
+/* Headings */
 h1 {
   font-size: 24px;
   font-weight: bold;
@@ -132,17 +39,94 @@ h5 {
   font-weight: bold;
 }
 
+/* Article Input & Output */
+textarea,
+#output {
+  width: 100%;
+  min-height: 250px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: white;
+  resize: vertical;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Keyword Input Boxes */
+.keyword-inputs textarea {
+  width: 100%;
+  height: 100px;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+/* Buttons */
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px 5px 15px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Highlights */
+.highlight-yellow {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+.highlight-purple {
+  background-color: #e1bdf0;
+  font-weight: bold;
+}
+
+.highlight-bold {
+  font-weight: bold;
+}
+
+/* Keyword Summary */
+#keywordSummary {
+  margin-top: 30px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+#keywordSummary h3 {
+  margin-bottom: 10px;
+}
+
 /* Legend */
 #legend {
-  margin-top: 20px;
-  padding: 10px;
-  border-top: 1px solid #ccc;
+  margin-top: 30px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
   margin: 5px 0;
+  font-size: 14px;
 }
 
 .color-box {
@@ -150,52 +134,30 @@ h5 {
   width: 20px;
   height: 20px;
   margin-right: 10px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
-/* Suggestion Box */
-#suggestionBox {
-  margin-top: 30px;
-  padding: 10px;
-  border: 1px dashed #666;
-  background-color: #fffbe6;
-  border-radius: 5px;
+.color-yellow {
+  background-color: yellow;
 }
 
-.suggestion {
-  margin-bottom: 10px;
-  padding: 5px;
-  border-left: 4px solid #3498db;
-  background-color: #f0f9ff;
-  padding-left: 10px;
+.color-purple {
+  background-color: #e1bdf0;
 }
 
-/* Copy Button Area */
-#copyButtonArea {
-  margin-top: 20px;
+.color-bold {
+  background-color: #999;
 }
 
-/* Keyword Summary Table */
-#keywordSummaryTable {
-  width: 100%;
-  margin-top: 20px;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-#keywordSummaryTable th, #keywordSummaryTable td {
-  border: 1px solid #ccc;
-  padding: 6px 10px;
-  text-align: left;
-}
-
-#keywordSummaryTable th {
-  background-color: #f2f2f2;
+/* Clipboard Button */
+#copyBtn {
+  margin-top: 15px;
 }
 
 /* Responsive */
-@media screen and (max-width: 768px) {
+@media (max-width: 768px) {
   .container {
     width: 95%;
+    padding: 15px;
   }
 }
