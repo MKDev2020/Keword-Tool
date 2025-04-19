@@ -1,3 +1,5 @@
+document.getElementById("runButton").addEventListener("click", highlightKeywords); // Ensure the button triggers the function
+
 function highlightKeywords() {
   const article = document.getElementById("article").value.toLowerCase();
   const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(keyword => keyword.trim().toLowerCase());
@@ -77,22 +79,11 @@ function getKeywordType(keyword) {
   const sectionKeywords = document.getElementById("sectionKeywords").value.split("\n").map(k => k.trim().toLowerCase());
 
   if (tableKeywords.includes(keyword)) {
-    return 'Table Keyword';
+    return "Table";
   } else if (lsiKeywords.includes(keyword)) {
-    return 'LSI Keyword';
+    return "LSI";
   } else if (sectionKeywords.includes(keyword)) {
-    return 'Section Keyword';
+    return "Section";
   }
-  return 'Unknown';
-}
-
-function copyToClipboard() {
-  const outputText = document.getElementById("output").innerText;
-  const textArea = document.createElement("textarea");
-  textArea.value = outputText;
-  document.body.appendChild(textArea);
-  textArea.select();
-  document.execCommand('copy');
-  document.body.removeChild(textArea);
-  alert('Copied to clipboard!');
+  return "Unknown";
 }
