@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Keyword Tool by MK</title>
   <style>
-    /* General Styles */
+    /* General styles */
     body {
       font-family: Arial, sans-serif;
       margin: 2rem;
       background: #f9f9f9;
-      color: #222;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     h1 {
       color: #222;
+      text-align: center;
     }
 
     textarea, input, button {
@@ -23,16 +23,9 @@
       margin: 10px 0;
       padding: 10px;
       font-size: 16px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    textarea {
-      min-height: 150px;
-    }
-
-    /* Highlighted Article & Summary Section */
-    #output {
+    #output, #article-summary {
       border: 1px solid #ccc;
       background: #fff;
       padding: 1rem;
@@ -56,42 +49,6 @@
       padding: 8px;
     }
 
-    /* Light Mode Styles */
-    .light-mode {
-      background-color: #f9f9f9;
-      color: #222;
-    }
-
-    .light-mode textarea, .light-mode button {
-      background-color: #fff;
-      color: #222;
-      border: 1px solid #ccc;
-    }
-
-    /* Dark Mode Styles */
-    .dark-mode {
-      background-color: #1a1a1a;
-      color: #fff;
-    }
-
-    .dark-mode textarea, .dark-mode button {
-      background-color: #333;
-      color: #fff;
-      border: 1px solid #444;
-    }
-
-    .keyword-light {
-      background-color: #ffeb3b;
-    }
-
-    .keyword-section {
-      background-color: #4caf50;
-    }
-
-    .keyword-lsi {
-      background-color: #2196f3;
-    }
-
     .color-box {
       display: inline-block;
       width: 12px;
@@ -101,34 +58,73 @@
       border-radius: 2px;
     }
 
-    /* Button styles */
-    .mode-toggle, .copy-button {
-      margin-top: 10px;
-      padding: 8px 16px;
-      background-color: #2196f3;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+    /* Dark mode styles */
+    body.dark-mode {
+      background-color: #121212;
+      color: #ffffff;
     }
 
-    .mode-toggle:hover, .copy-button:hover {
-      background-color: #1976d2;
+    body.dark-mode h1 {
+      color: #ffffff;
     }
-    
-    .copy-button:focus {
-      outline: none;
+
+    body.dark-mode textarea, body.dark-mode input, body.dark-mode button {
+      background-color: #333;
+      color: #fff;
+      border: 1px solid #555;
+    }
+
+    body.dark-mode #output, body.dark-mode #article-summary {
+      background-color: #333;
+      color: #fff;
+      border: 1px solid #555;
+    }
+
+    body.dark-mode .summary-table {
+      border: 1px solid #555;
+    }
+
+    body.dark-mode .color-box {
+      border: 1px solid #fff;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* Add some hover effects */
+    button:hover {
+      background-color: #0056b3;
+      color: white;
+    }
+
+    /* Floating toggle button for dark mode */
+    .dark-mode-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .dark-mode-toggle i {
+      color: #333;
+    }
+
+    .dark-mode .dark-mode-toggle i {
+      color: white;
     }
   </style>
 </head>
-<body class="light-mode">
+<body>
   <h1>Keyword Tool by MK</h1>
-  
   <label>Paste your article here:</label>
   <textarea id="article" rows="10"></textarea>
 
-  <label>Enter keywords (one per line):</label>
+  <label>Enter keywords (one per line; [color they will be highlighted in]):</label>
   <textarea id="keywords" rows="6"></textarea>
 
   <button onclick="highlightKeywords()">Run</button>
@@ -139,97 +135,81 @@
   <h2>Keyword Summary</h2>
   <table class="summary-table" id="summary"></table>
 
-  <!-- Mode toggle and copy button -->
-  <button class="mode-toggle" onclick="toggleMode()">Toggle Dark/Light Mode</button>
-  <button class="copy-button" onclick="copyToClipboard()">Copy Summary</button>
+  <!-- Dark Mode Toggle Button -->
+  <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+    <i id="dark-mode-icon">🌙</i> 
+  </button>
 
   <script>
-    // Toggle between dark and light mode
-    function toggleMode() {
-      const body = document.body;
-      const currentMode = body.classList.contains('dark-mode') ? 'dark' : 'light';
-      if (currentMode === 'light') {
-        body.classList.replace('light-mode', 'dark-mode');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        body.classList.replace('dark-mode', 'light-mode');
-        localStorage.setItem('theme', 'light');
-      }
+    // Initialize dark mode preference
+    const userPref = localStorage.getItem('darkMode');
+    if (userPref === 'true') {
+      document.body.classList.add('dark-mode');
     }
 
-    // Store user preferences for theme
-    window.onload = function() {
-      const savedTheme = localStorage.getItem('theme') || 'light';
-      document.body.classList.add(savedTheme + '-mode');
-    };
+    // Function to toggle dark mode
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDarkMode = document.body.classList.contains('dark-mode');
+      localStorage.setItem('darkMode', isDarkMode);
+      document.getElementById('dark-mode-icon').textContent = isDarkMode ? '🌞' : '🌙';
+    }
 
-    // Highlight Keywords and display in article and summary
     function highlightKeywords() {
       const article = document.getElementById('article').value;
-      const rawKeywords = document.getElementById('keywords').value.split('\n').map(k => k.trim().toLowerCase()).filter(k => k);
-      const keywordColors = { "table": "light", "section": "green", "lsi": "blue" };
-      const summary = { "table": {}, "section": {}, "lsi": {} };
+      const rawKeywords = document.getElementById('keywords').value
+        .split('\n')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k);
+
+      // Prepare for specific keyword groups and colors
+      const sortedKeywords = rawKeywords.map(k => {
+        const [kw, color] = k.split(';').map(item => item.trim());
+        return { keyword: kw, color: color || 'gray' };
+      });
+
+      const summary = {};
 
       let workingText = ` ${article} `;
       const placeholders = [];
 
-      for (let kw of rawKeywords) {
-        const type = kw.includes('section') ? "section" : (kw.includes('lsi') ? "lsi" : "table");
-        const colorClass = `keyword-${keywordColors[type]}`;
-        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+      // Loop through keywords and replace them in the text
+      for (let { keyword, color } of sortedKeywords) {
+        const pattern = new RegExp(`(?<!\\w)${keyword}(?!\\w)`, 'gi');
         let match;
-
         while ((match = pattern.exec(workingText)) !== null) {
           const placeholder = `{{kw${placeholders.length}}}`;
-          placeholders.push({
-            placeholder,
-            keyword: match[0],
-            colorClass,
-            original: match[0],
-            start: match.index
-          });
-
+          placeholders.push({ placeholder, keyword: match[0], color });
           workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
           pattern.lastIndex = match.index + placeholder.length;
 
-          summary[type][kw] = (summary[type][kw] || 0) + 1;
+          // Update summary count
+          summary[keyword] = (summary[keyword] || 0) + 1;
         }
       }
 
-      // Replace placeholders with spans
-      placeholders.sort((a, b) => a.start - b.start);
+      // Replace placeholders with spans for highlighted keywords
+      placeholders.sort((a, b) => a.placeholder.localeCompare(b.placeholder));
       for (let p of placeholders) {
-        workingText = workingText.replace(
-          p.placeholder,
-          `<span class="keyword ${p.colorClass}">${p.original}</span>`
-        );
+        workingText = workingText.replace(p.placeholder, `<span class="keyword" style="background-color:${p.color}">${p.keyword}</span>`);
       }
 
       document.getElementById('output').innerHTML = workingText.trim();
 
       // Build summary table
-      let tableHTML = "<tr><th>Keyword</th><th>Type</th><th>Count</th><th>Color</th></tr>";
-      for (let type in summary) {
-        for (let kw in summary[type]) {
-          const count = summary[type][kw];
-          const color = keywordColors[type] || "#eee";
-          tableHTML += `<tr><td>${kw}</td><td>${type}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
-        }
+      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th><th>Type</th></tr>";
+      for (let { keyword, color } of sortedKeywords) {
+        const count = summary[keyword] || 0;
+        tableHTML += `<tr><td>${keyword}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td><td>${getKeywordType(keyword)}</td></tr>`;
       }
-
       document.getElementById('summary').innerHTML = tableHTML;
     }
 
-    // Copy to clipboard with formatting
-    function copyToClipboard() {
-      const summaryText = document.getElementById('summary').innerText;
-      const textarea = document.createElement('textarea');
-      document.body.appendChild(textarea);
-      textarea.value = summaryText;
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-      alert("Summary copied to clipboard!");
+    function getKeywordType(keyword) {
+      // Example classification logic for keyword types, you can adjust this based on your needs
+      if (keyword.includes('table')) return 'Table KW';
+      if (keyword.includes('section')) return 'Section-specific KW';
+      return 'LSI KW';
     }
   </script>
 </body>
