@@ -3,51 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keyword Tool by MK</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Keyword Highlighter</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>Keyword Highlighter</h1>
 
-  <h1>Keyword Tool by MK</h1>
+  <!-- Article Input -->
+  <label for="article">Paste your article here:</label>
+  <textarea id="article" placeholder="Paste your article here..."></textarea>
 
-  <!-- Paste Article Section -->
-  <h2>Paste Your Article Here:</h2>
-  <textarea id="article" placeholder="Paste your article text here"></textarea>
+  <!-- Table Keywords Input -->
+  <label for="tableKeywords">Enter Table Keywords (Highlighted in Yellow):</label>
+  <textarea id="tableKeywords" placeholder="Enter Table Keywords..."></textarea>
 
-  <!-- Keyword Input Fields -->
-  <h2>Enter Table Keywords (Highlighted in Yellow):</h2>
-  <div id="tableKeywords-box">
-    <textarea id="tableKeywords" placeholder="Enter table-related keywords (one per line)"></textarea>
-  </div>
+  <!-- LSI Keywords Input -->
+  <label for="lsiKeywords">Enter LSI Keywords (Highlighted in Light Blue):</label>
+  <textarea id="lsiKeywords" placeholder="Enter LSI Keywords..."></textarea>
 
-  <h2>Enter LSI Keywords (Highlighted in Light Blue):</h2>
-  <div id="lsiKeywords-box">
-    <textarea id="lsiKeywords" placeholder="Enter LSI keywords (one per line)"></textarea>
-  </div>
+  <!-- Section Keywords Input -->
+  <label for="sectionKeywords">Enter Section Keywords (Highlighted in Light Green):</label>
+  <textarea id="sectionKeywords" placeholder="Enter Section Keywords..."></textarea>
 
-  <h2>Enter Section Keywords (Highlighted in Light Green):</h2>
-  <div id="sectionKeywords-box">
-    <textarea id="sectionKeywords" placeholder="Enter section-specific keywords (one per line)"></textarea>
-  </div>
+  <!-- Run Button -->
+  <button id="runBtn" onclick="highlightKeywords()">Run</button>
 
-  <!-- Action Buttons -->
-  <button id="runButton" onclick="highlightKeywords()">Run</button>
-  <button id="copyButton" onclick="copyToClipboard()">Copy to Clipboard</button>
+  <!-- Copy to Clipboard Button -->
+  <button id="copyBtn" onclick="copyToClipboard()">Copy to Clipboard</button>
 
   <!-- Output Section -->
   <div id="output"></div>
 
-  <!-- Summary Section -->
-  <h2>Keyword Summary:</h2>
-  <table class="summary-table" id="summary">
-    <tr>
-      <th>Keyword</th>
-      <th>Count</th>
-      <th>Color</th>
-      <th>Type</th>
-    </tr>
-    <!-- Rows will be added dynamically -->
-  </table>
+  <!-- Summary Table Section -->
+  <div id="summary"></div>
 
   <script src="script.js"></script>
 </body>
