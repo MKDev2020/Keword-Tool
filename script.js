@@ -10,29 +10,7 @@ function highlightKeywords() {
   let output = article;
   const keywordCounts = {};
 
-  // Count and highlight keywords, ensure non-overlapping matches
-  allKeywords.forEach(keyword => {
-    if (keyword !== "") {
-      // Create a non-overlapping regular expression match
-      const keywordRegex = new RegExp(`\\b${keyword}\\b`, "g");
-      const matches = [...article.matchAll(keywordRegex)]; // Use matchAll to get all matches
-      
-      // Count the number of matches (this gives the correct count for non-overlapping instances)
-      const count = matches.length;
-      keywordCounts[keyword] = count;
-
-      // Highlight each instance in the output, ensuring no overlap
-      matches.forEach(match => {
-        const highlightedKeyword = `<span class="keyword" style="background-color: ${getColorForKeyword(keyword)};">${match[0]}</span>`;
-        output = output.replace(match[0], highlightedKeyword);
-      });
-    }
-  });
-
-  // Display the output with highlighted keywords
-  document.getElementById("output").innerHTML = output;
-
-  // Display summary
+  // Clear previous summary
   const summaryTable = document.getElementById("summary");
   summaryTable.innerHTML = `
     <tr>
@@ -42,6 +20,29 @@ function highlightKeywords() {
       <th>Type</th>
     </tr>
   `;
+
+  // Count and highlight keywords, ensure non-overlapping matches
+  allKeywords.forEach(keyword => {
+    if (keyword !== "") {
+      const keywordRegex = new RegExp(`\\b${keyword}\\b`, "g");
+      let count = 0;
+
+      // Match all occurrences of the keyword
+      output = output.replace(keywordRegex, (match) => {
+        count++; // Increment count for each match
+        return `<span class="keyword" style="background-color: ${getColorForKeyword(keyword)};">${match}</span>`;
+      });
+
+      if (count > 0) {
+        keywordCounts[keyword] = count; // Update keyword count
+      }
+    }
+  });
+
+  // Display the output with highlighted keywords
+  document.getElementById("output").innerHTML = output;
+
+  // Display summary with correct counts
   allKeywords.forEach(keyword => {
     if (keywordCounts[keyword] > 0) {
       const row = document.createElement("tr");
@@ -55,6 +56,7 @@ function highlightKeywords() {
     }
   });
 }
+
 
 
 function getColorForKeyword(keyword) {
