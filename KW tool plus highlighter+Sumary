@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyword Highlighter</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .highlight { background-color: yellow; color: black; }
+    .keyword-summary { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Keyword Highlighter</h1>
+  <textarea id="article" rows="10" cols="60" placeholder="Paste your article here"></textarea>
+  <br />
+  <input type="text" id="keywords" placeholder="Enter keywords, separated by commas" />
+  <button onclick="highlightKeywords()">Highlight Keywords</button>
+  <div id="highlightedText"></div>
+
+  <div class="keyword-summary">
+    <h2>Keyword Summary</h2>
+    <ul id="keywordList"></ul>
+  </div>
+
+  <script>
+    function highlightKeywords() {
+      var articleText = document.getElementById("article").value;
+      var keywords = document.getElementById("keywords").value.split(',');
+      var highlightedText = articleText;
+
+      keywords.forEach(function(keyword) {
+        var regex = new RegExp(`(${keyword.trim()})`, 'gi');
+        highlightedText = highlightedText.replace(regex, '<span class="highlight">$1</span>');
+      });
+
+      document.getElementById("highlightedText").innerHTML = highlightedText;
+
+      // Generate keyword summary
+      var keywordListHTML = '';
+      keywords.forEach(function(keyword) {
+        var count = (highlightedText.match(new RegExp(keyword.trim(), 'gi')) || []).length;
+        keywordListHTML += `<li>${keyword.trim()}: ${count} occurrences</li>`;
+      });
+      document.getElementById("keywordList").innerHTML = keywordListHTML;
+    }
+  </script>
+</body>
+</html>
