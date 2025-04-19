@@ -1,55 +1,82 @@
-document.getElementById("analyzeBtn").addEventListener("click", function() {
-    // Get the input article text and keywords
-    let articleText = document.getElementById("articleInput").value;
-    let tableKW = document.getElementById("tableKW").value.split("\n").filter(kw => kw.trim() !== "");
-    let lsiKW = document.getElementById("lsiKW").value.split("\n").filter(kw => kw.trim() !== "");
-    let sectionKW = document.getElementById("sectionKW").value.split("\n").filter(kw => kw.trim() !== "");
+function highlightKeywords() {
+  const article = document.getElementById('article').value;
 
-    // Function to count occurrences of a keyword (non-overlapping)
-    function countOccurrences(text, keyword) {
-        let regex = new RegExp("\\b" + keyword + "\\b", "gi");
-        return (text.match(regex) || []).length;
+  const tableKeywords = document.getElementById('tableKeywords').value
+    .split('\n')
+    .map(k => k.trim().toLowerCase())
+    .filter(k => k);
+
+  const lsiKeywords = document.getElementById('lsiKeywords').value
+    .split('\n')
+    .map(k => k.trim().toLowerCase())
+    .filter(k => k);
+
+  const sectionKeywords = document.getElementById('sectionKeywords').value
+    .split('\n')
+    .map(k => k.trim().toLowerCase())
+    .filter(k => k);
+
+  // Sort keywords by length for more accurate highlighting
+  const sortedKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
+
+  const usedSpans = [];
+  const keywordColors = {};
+  const summary = {};
+
+  function getRandomColor() {
+    const hue = Math.floor(Math.random() * 360);
+    return `hsl(${hue}, 80%, 80%)`;
+  }
+
+  let workingText = ` ${article} `;
+  const placeholders = [];
+
+  // Combine all keywords into one array
+  const allKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
+
+  for (let i = 0; i < allKeywords.length; i++) {
+    const kw = allKeywords[i];
+    const color = getRandomColor();
+    keywordColors[kw] = color;
+
+    const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+    let match;
+
+    while ((match = pattern.exec(workingText)) !== null) {
+      const placeholder = `{{kw${placeholders.length}}}`;
+      placeholders.push({
+        placeholder,
+        keyword: match[0],
+        color,
+        original: match[0],
+        start: match.index
+      });
+
+      workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
+      pattern.lastIndex = match.index + placeholder.length;
+
+      summary[kw] = (summary[kw] || 0) + 1;
     }
+  }
 
-    // Results container
-    let results = "";
+  // Replace placeholders with spans for actual keyword highlighting
+  placeholders.sort((a, b) => a.start - b.start);
+  for (let p of placeholders) {
+    workingText = workingText.replace(
+      p.placeholder,
+      `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`
+    );
+  }
 
-    // Analyze for table keywords
-    tableKW.forEach(kw => {
-        let count = countOccurrences(articleText, kw);
-        results += `<p><span class="highlight yellow">${kw}</span>: ${count} occurrences</p>`;
-    });
+  document.getElementById('output').innerHTML = workingText.trim();
 
-    // Analyze for LSI keywords
-    lsiKW.forEach(kw => {
-        let count = countOccurrences(articleText, kw);
-        results += `<p><span class="highlight purple">${kw}</span>: ${count} occurrences</p>`;
-    });
+  // Build the summary table with keyword counts
+  let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
+  for (let kw of sortedKeywords) {
+    const count = summary[kw] || 0;
+    const color = keywordColors[kw] || "#eee";
+    tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+  }
 
-    // Analyze for section-specific keywords
-    sectionKW.forEach(kw => {
-        let count = countOccurrences(articleText, kw);
-        results += `<p><span class="highlight bold">${kw}</span>: ${count} occurrences</p>`;
-    });
-
-    // Display the results
-    document.getElementById("kwResult").innerHTML = results;
-
-    // Update the keyword density
-    let totalWords = articleText.split(/\s+/).length;
-    let totalKWCount = tableKW.concat(lsiKW, sectionKW).reduce((acc, kw) => acc + countOccurrences(articleText, kw), 0);
-    let density = ((totalKWCount / totalWords) * 100).toFixed(2);
-    document.getElementById("kwResult").innerHTML += `<p>Keyword Density: ${density}%</p>`;
-});
-
-// Copy to clipboard functionality
-document.getElementById("copyToClipboard").addEventListener("click", function() {
-    let textToCopy = document.getElementById("kwResult").innerText;
-    let textArea = document.createElement("textarea");
-    textArea.value = textToCopy;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textArea);
-    alert("Results copied to clipboard!");
-});
+  document.getElementById('summary').innerHTML = tableHTML;
+}
