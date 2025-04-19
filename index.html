@@ -7,35 +7,47 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Keyword Highlighter</h1>
+  <h1>Keyword Highlighter Tool</h1>
 
-  <!-- Article Input -->
-  <label for="article">Paste your article here:</label>
-  <textarea id="article" placeholder="Paste your article here..."></textarea>
+  <div>
+    <label for="article">Paste your article here:</label>
+    <textarea id="article" placeholder="Paste your article here..."></textarea>
+  </div>
 
-  <!-- Table Keywords Input -->
-  <label for="tableKeywords">Enter Table Keywords (Highlighted in Yellow):</label>
-  <textarea id="tableKeywords" placeholder="Enter Table Keywords..."></textarea>
+  <div>
+    <label for="tableKeywords">Enter Table Keywords (Highlighted in Yellow):</label>
+    <textarea id="tableKeywords" placeholder="Enter your table keywords, one per line"></textarea>
+  </div>
 
-  <!-- LSI Keywords Input -->
-  <label for="lsiKeywords">Enter LSI Keywords (Highlighted in Light Blue):</label>
-  <textarea id="lsiKeywords" placeholder="Enter LSI Keywords..."></textarea>
+  <div>
+    <label for="lsiKeywords">Enter LSI Keywords (Highlighted in Light Blue):</label>
+    <textarea id="lsiKeywords" placeholder="Enter your LSI keywords, one per line"></textarea>
+  </div>
 
-  <!-- Section Keywords Input -->
-  <label for="sectionKeywords">Enter Section Keywords (Highlighted in Light Green):</label>
-  <textarea id="sectionKeywords" placeholder="Enter Section Keywords..."></textarea>
+  <div>
+    <label for="sectionKeywords">Enter Section Keywords (Highlighted in Light Green):</label>
+    <textarea id="sectionKeywords" placeholder="Enter your section keywords, one per line"></textarea>
+  </div>
 
-  <!-- Run Button -->
-  <button id="runBtn" onclick="highlightKeywords()">Run</button>
+  <button id="runBtn">Run</button>
+  <button id="copyBtn">Copy to Clipboard</button>
 
-  <!-- Copy to Clipboard Button -->
-  <button id="copyBtn" onclick="copyToClipboard()">Copy to Clipboard</button>
-
-  <!-- Output Section -->
   <div id="output"></div>
 
-  <!-- Summary Table Section -->
-  <div id="summary"></div>
+  <h2>Summary</h2>
+  <table id="summary" class="summary-table">
+    <thead>
+      <tr>
+        <th>Keyword</th>
+        <th>Count</th>
+        <th>Color</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Summary rows will be populated here -->
+    </tbody>
+  </table>
 
   <script src="script.js"></script>
 </body>
