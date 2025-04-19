@@ -1,61 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keyword Tool by MK</title>
-
-    <!-- Include Quill CSS -->
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="styles.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keyword Tool by MK</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="container">
+    <h1>Keyword Tool by MK</h1>
 
-    <!-- Container for the whole tool -->
-    <div class="container">
-        <h1>Keyword Tool by MK</h1>
+    <!-- Article Input -->
+    <textarea id="articleInput" placeholder="Paste your article here..."></textarea>
 
-        <!-- Article Input Box -->
-        <textarea id="articleInput" placeholder="Paste your article here..."></textarea>
-
-        <!-- Toolbar for text formatting and keyword actions -->
-        <div class="toolbar">
-            <button onclick="applyFormatting('bold')"><b>B</b></button>
-            <button onclick="applyFormatting('italic')"><i>I</i></button>
-            <button onclick="applyFormatting('underline')"><u>U</u></button>
-            <button onclick="applyFormatting('strikeThrough')">S</button>
-            <button onclick="applyFormatting('fontSize', '16')">Font Size 16</button>
-            <button onclick="applyFormatting('foreColor', 'red')">Text Color</button>
-            <button onclick="applyFormatting('backColor', 'yellow')">Highlight</button>
-            <button onclick="applyFormatting('justifyLeft')">Left Align</button>
-            <button onclick="applyFormatting('justifyCenter')">Center Align</button>
-            <button onclick="applyFormatting('justifyRight')">Right Align</button>
-            <!-- Heading Buttons -->
-            <button onclick="applyFormatting('formatBlock', 'H1')">H1</button>
-            <button onclick="applyFormatting('formatBlock', 'H2')">H2</button>
-            <button onclick="applyFormatting('formatBlock', 'H3')">H3</button>
-            <button onclick="applyFormatting('formatBlock', 'H4')">H4</button>
-            <button onclick="applyFormatting('formatBlock', 'H5')">H5</button>
-        </div>
-
-        <!-- Keyword Summary and Count -->
-        <div id="kwSummary">
-            <h3>Keyword Summary</h3>
-            <div id="kwCount">Total Keywords: 0</div>
-            <div id="kwLegend">
-                <h4>Legend:</h4>
-                <p>Highlighted words are keywords in the article</p>
-            </div>
-        </div>
-
-        <!-- Quill Editor for keyword highlighting (but not editable directly by user) -->
-        <div id="editor-container" contenteditable="true"></div>
-
-        <!-- JavaScript functionality -->
-        <script src="script.js"></script>
+    <!-- Keyword Inputs -->
+    <div id="keywordInputs">
+      <h2>Keyword Groups</h2>
+      <textarea id="tableKeywords" placeholder="Table Keywords (highlighted in yellow)"></textarea>
+      <textarea id="lsiKeywords" placeholder="LSI Keywords (highlighted in light purple)"></textarea>
+      <textarea id="sectionKeywords" placeholder="Section-Specific Keywords (bolded)"></textarea>
     </div>
 
+    <!-- Text Formatting -->
+    <div id="textFormattingButtons">
+      <button onclick="formatText('bold')">Bold</button>
+      <button onclick="formatText('italic')">Italic</button>
+      <button onclick="formatText('underline')">Underline</button>
+      <button onclick="applyHeading('h1')">H1</button>
+      <button onclick="applyHeading('h2')">H2</button>
+      <button onclick="applyHeading('h3')">H3</button>
+      <button onclick="applyHeading('h4')">H4</button>
+      <button onclick="applyHeading('h5')">H5</button>
+    </div>
+
+    <!-- Process & Output -->
+    <button onclick="analyzeKeywords()">Analyze Keywords</button>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+
+    <div id="output"></div>
+
+    <!-- Summary Section -->
+    <div id="summary">
+      <h2>Keyword Summary</h2>
+      <div id="summaryTable"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
