@@ -51,19 +51,19 @@ button {
   transition: background-color 0.3s ease; /* Smooth transition for hover */
 }
 
-button#runBtn {
-  background-color: #C0C0C0;  /* Shiny Silver for Run button */
+button#runButton {
+  background-color: #C0C0C0; /* Shiny Silver for static color */
 }
 
-button#runBtn:hover {
+button#runButton:hover {
   background-color: #45a049;  /* Green for Run button hover */
 }
 
-button#copyBtn {
-  background-color: #C0C0C0;  /* Shiny Silver for Copy button */
+button#copyButton {
+  background-color: #C0C0C0; /* Shiny Silver for static color */
 }
 
-button#copyBtn:hover {
+button#copyButton:hover {
   background-color: #800080;  /* Purple for Copy to Clipboard button hover */
 }
 
