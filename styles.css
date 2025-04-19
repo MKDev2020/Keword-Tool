@@ -7,21 +7,25 @@ body {
 }
 
 .container {
-  width: 80%;
+  width: 90%;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* Article Input and Output */
-#articleInput {
+/* Text Areas */
+textarea, input[type="text"] {
   width: 100%;
-  height: 300px;
   padding: 10px;
+  margin-top: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
-  line-height: 1.6;
   background-color: white;
+  resize: vertical;
+}
+
+#articleInput {
+  height: 300px;
 }
 
 #output {
@@ -36,13 +40,13 @@ body {
   line-height: 1.6;
 }
 
-/* Button Styling */
+/* Buttons */
 button {
   background-color: #3498db;
   color: white;
   border: none;
   padding: 10px 15px;
-  margin: 5px;
+  margin: 5px 3px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
@@ -57,27 +61,40 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Text Formatting Buttons */
-#textFormattingButtons {
-  margin-top: 20px;
-  margin-bottom: 20px;
+/* Keyword Input Groups */
+.keyword-box {
+  margin-bottom: 15px;
 }
 
-/* Keyword Highlighting */
-.highlight {
-  padding: 0 5px;
-  color: white;
+.keyword-box label {
   font-weight: bold;
-  background-color: #3498db;
 }
 
-/* Font & Size Options */
-#fontOptions {
-  margin-top: 20px;
-  margin-bottom: 20px;
+.keyword-box textarea {
+  height: 100px;
+  font-size: 14px;
 }
 
-/* Font Size and Family */
+/* Highlight Classes */
+.highlight-yellow {
+  background-color: yellow;
+  font-weight: bold;
+}
+
+.highlight-purple {
+  background-color: #d8bfe7;
+  font-weight: bold;
+}
+
+.bold-only {
+  font-weight: bold;
+}
+
+/* Font Formatting */
+#textFormattingButtons {
+  margin: 20px 0;
+}
+
 select, .font-size-btn {
   padding: 5px;
   margin: 5px;
@@ -89,44 +106,7 @@ select {
   width: 120px;
 }
 
-/* Text Color and Highlighting */
-.color-palette {
-  display: flex;
-  margin-top: 20px;
-}
-
-.color-palette div {
-  width: 30px;
-  height: 30px;
-  margin-right: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* Legend */
-#legend {
-  margin-top: 20px;
-}
-
-#legend .legend-item {
-  margin-bottom: 5px;
-}
-
-#legend .legend-item span {
-  margin-left: 10px;
-  font-size: 14px;
-}
-
-/* Text Area Styling */
-textarea {
-  resize: none;
-}
-
-input[type="file"] {
-  margin-top: 20px;
-}
-
-/* Heading Styles */
+/* Font Sizes */
 h1 {
   font-size: 24px;
   font-weight: bold;
@@ -152,31 +132,70 @@ h5 {
   font-weight: bold;
 }
 
-/* Formatting for KW Summary */
-#kwSummary {
+/* Legend */
+#legend {
   margin-top: 20px;
   padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.color-box {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border-radius: 3px;
+}
+
+/* Suggestion Box */
+#suggestionBox {
+  margin-top: 30px;
+  padding: 10px;
+  border: 1px dashed #666;
+  background-color: #fffbe6;
+  border-radius: 5px;
+}
+
+.suggestion {
+  margin-bottom: 10px;
+  padding: 5px;
+  border-left: 4px solid #3498db;
+  background-color: #f0f9ff;
+  padding-left: 10px;
+}
+
+/* Copy Button Area */
+#copyButtonArea {
+  margin-top: 20px;
+}
+
+/* Keyword Summary Table */
+#keywordSummaryTable {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+#keywordSummaryTable th, #keywordSummaryTable td {
   border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: white;
+  padding: 6px 10px;
+  text-align: left;
 }
 
-/* Suggestion Button Styling */
-.suggestion-btn {
-  background-color: #e67e22;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin: 5px;
-  border-radius: 5px;
-  cursor: pointer;
+#keywordSummaryTable th {
+  background-color: #f2f2f2;
 }
 
-.suggestion-btn:hover {
-  background-color: #d35400;
-}
-
-.suggestion-btn:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .container {
+    width: 95%;
+  }
 }
