@@ -1,20 +1,38 @@
-document.getElementById("runButton").addEventListener("click", highlightKeywords);
-
 function highlightKeywords() {
-  const article = document.getElementById("article").value.toLowerCase();
-  
-  // Split keywords and clean them up
-  const tableKeywords = cleanKeywords(document.getElementById("tableKeywords").value);
-  const lsiKeywords = cleanKeywords(document.getElementById("lsiKeywords").value);
-  const sectionKeywords = cleanKeywords(document.getElementById("sectionKeywords").value);
+  const article = document.getElementById('article').value;
+  const tableKeywords = document.getElementById('tableKeywords').value.split('\n').map(kw => kw.trim());
+  const lsiKeywords = document.getElementById('lsiKeywords').value.split('\n').map(kw => kw.trim());
+  const sectionKeywords = document.getElementById('sectionKeywords').value.split('\n').map(kw => kw.trim());
 
-  const allKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
-  
-  let output = article;
-  const keywordCounts = {}; // To keep track of counts for each keyword
+  let keywordCounts = {};
 
-  // Clear previous summary
-  const summaryTable = document.getElementById("summary");
+  // Count occurrences of each keyword in the article
+  function countKeywordOccurrences(keywords) {
+    keywords.forEach(keyword => {
+      if (keyword) {
+        const regex = new RegExp(`\\b${escapeRegExp(keyword)}\\b`, 'gi');
+        const matches = article.match(regex);
+        const count = matches ? matches.length : 0;
+        if (count > 0) {
+          keywordCounts[keyword] = count;
+        }
+      }
+    });
+  }
+
+  countKeywordOccurrences(tableKeywords);
+  countKeywordOccurrences(lsiKeywords);
+  countKeywordOccurrences(sectionKeywords);
+
+  displaySummary();
+}
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
+}
+
+function displaySummary() {
+  const summaryTable = document.getElementById('summary');
   summaryTable.innerHTML = `
     <tr>
       <th>Keyword</th>
@@ -24,73 +42,32 @@ function highlightKeywords() {
     </tr>
   `;
 
-  // Process each keyword and highlight
-  allKeywords.forEach(keyword => {
-    if (keyword !== "") {
-      const keywordRegex = new RegExp(`\\b${keyword}\\b`, "g");
-      let count = 0;
+  for (const keyword in keywordCounts) {
+    const count = keywordCounts[keyword];
+    let color = '';
 
-      output = output.replace(keywordRegex, (match) => {
-        count++;
-        return `<span class="keyword" style="background-color: ${getColorForKeyword(keyword)};">${match}</span>`;
-      });
-
-      if (count > 0) {
-        keywordCounts[keyword] = count;
-      }
+    if (tableKeywords.includes(keyword)) {
+      color = 'yellow';
+    } else if (lsiKeywords.includes(keyword)) {
+      color = 'lightblue';
+    } else if (sectionKeywords.includes(keyword)) {
+      color = 'lightgreen';
     }
-  });
 
-  // Display the highlighted article
-  document.getElementById("output").innerHTML = output;
-
-  // Update summary table with keyword counts
-  allKeywords.forEach(keyword => {
-    if (keywordCounts[keyword] > 0) {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${keyword}</td>
-        <td>${keywordCounts[keyword]}</td>
-        <td><span class="color-box" style="background-color: ${getColorForKeyword(keyword)};"></span></td>
-        <td>${getKeywordType(keyword)}</td>
-      `;
-      summaryTable.appendChild(row);
-    }
-  });
-}
-
-function cleanKeywords(input) {
-  return input.split("\n")
-    .map(keyword => keyword.trim().toLowerCase())
-    .filter(keyword => keyword !== ""); // Remove empty lines
-}
-
-function getColorForKeyword(keyword) {
-  const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(k => k.trim().toLowerCase());
-  const lsiKeywords = document.getElementById("lsiKeywords").value.split("\n").map(k => k.trim().toLowerCase());
-  const sectionKeywords = document.getElementById("sectionKeywords").value.split("\n").map(k => k.trim().toLowerCase());
-
-  if (tableKeywords.includes(keyword)) {
-    return '#FFD700'; // Yellow for table-related keywords
-  } else if (lsiKeywords.includes(keyword)) {
-    return '#98C7E4'; // Light Blue for LSI keywords
-  } else if (sectionKeywords.includes(keyword)) {
-    return '#D1F7A1'; // Light Green for section-specific keywords
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><span class="color-box" style="background-color:${color};"></span>${keyword}</td>
+      <td>${count}</td>
+      <td>${color}</td>
+      <td>${color ? color.charAt(0).toUpperCase() + color.slice(1) : 'None'}</td>
+    `;
+    summaryTable.appendChild(row);
   }
-  return '#FFFFFF'; // Default color
 }
 
-function getKeywordType(keyword) {
-  const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(k => k.trim().toLowerCase());
-  const lsiKeywords = document.getElementById("lsiKeywords").value.split("\n").map(k => k.trim().toLowerCase());
-  const sectionKeywords = document.getElementById("sectionKeywords").value.split("\n").map(k => k.trim().toLowerCase());
-
-  if (tableKeywords.includes(keyword)) {
-    return "Table";
-  } else if (lsiKeywords.includes(keyword)) {
-    return "LSI";
-  } else if (sectionKeywords.includes(keyword)) {
-    return "Section";
-  }
-  return "Unknown";
+function copyToClipboard() {
+  const text = document.getElementById('output').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Text copied to clipboard!');
+  });
 }
