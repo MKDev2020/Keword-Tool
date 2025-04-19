@@ -55,135 +55,98 @@
       vertical-align: middle;
       border-radius: 2px;
     }
-
-    .kw-box {
-      margin-bottom: 1rem;
-    }
-
-    .kw-box label {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .btn {
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-      border: none;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
-
-    .btn:hover {
-      background-color: #0056b3;
-    }
-
-    .btn:active {
-      background-color: #004085;
-    }
-
-    .toggle-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 20px;
-    }
-
-    .toggle-button img {
-      width: 20px;
-      height: 20px;
-    }
   </style>
 </head>
 <body>
   <h1>Keyword Tool by MK</h1>
-  
+
   <label>Paste your article here:</label>
   <textarea id="article" rows="10"></textarea>
+  <button onclick="copyToClipboard('article')">Copy to Clipboard</button>
 
-  <label>Enter Table Keywords (yellow):</label>
-  <textarea id="table_keywords" class="kw-box" rows="3" placeholder="one per line; yellow"></textarea>
+  <label>Enter table keywords (one per line):</label>
+  <textarea id="tableKeywords" rows="4"></textarea>
 
-  <label>Enter Section-Specific Keywords (green):</label>
-  <textarea id="section_keywords" class="kw-box" rows="3" placeholder="one per line; green"></textarea>
+  <label>Enter section keywords (one per line):</label>
+  <textarea id="sectionKeywords" rows="4"></textarea>
 
-  <label>Enter LSI Keywords (blue):</label>
-  <textarea id="lsi_keywords" class="kw-box" rows="3" placeholder="one per line; blue"></textarea>
+  <label>Enter LSI keywords (one per line):</label>
+  <textarea id="lsiKeywords" rows="4"></textarea>
 
-  <button class="btn" onclick="highlightKeywords()">Run</button>
-  <button class="btn" onclick="copyToClipboard()">Copy Summary</button>
+  <button onclick="highlightKeywords()">Run</button>
 
-  <h2>Analyzed Article</h2>
+  <h2>Highlighted Article</h2>
   <div id="output"></div>
+  <button onclick="copyToClipboard('output')">Copy to Clipboard</button>
 
   <h2>Keyword Summary</h2>
   <table class="summary-table" id="summary"></table>
 
-  <button class="btn" id="toggle-mode" onclick="toggleMode()">🌙</button>
-
   <script>
-    function highlightKeywords() {
-      const article = document.getElementById('article').value;
-      const tableKeywords = document.getElementById('table_keywords').value.split('\n').map(k => k.trim().toLowerCase());
-      const sectionKeywords = document.getElementById('section_keywords').value.split('\n').map(k => k.trim().toLowerCase());
-      const lsiKeywords = document.getElementById('lsi_keywords').value.split('\n').map(k => k.trim().toLowerCase());
-
-      const allKeywords = { 'Table Keywords': tableKeywords, 'Section-specific Keywords': sectionKeywords, 'LSI Keywords': lsiKeywords };
-      const summary = {};
-
-      let workingText = article;
-
-      Object.keys(allKeywords).forEach(keywordType => {
-        const keywords = allKeywords[keywordType];
-        const color = keywordType === 'Table Keywords' ? 'yellow' : keywordType === 'Section-specific Keywords' ? 'green' : 'blue';
-
-        keywords.forEach(kw => {
-          if (kw) {
-            const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
-            workingText = workingText.replace(pattern, `<span class="keyword" style="background-color:${color};">${kw}</span>`);
-            summary[kw] = (summary[kw] || 0) + 1;
-          }
-        });
-      });
-
-      document.getElementById('output').innerHTML = workingText;
-
-      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Type</th><th>Color</th></tr>";
-      Object.keys(summary).forEach(kw => {
-        let color = "gray";
-        let type = "Unknown";
-
-        if (tableKeywords.includes(kw)) {
-          color = "yellow";
-          type = "Table Keywords";
-        } else if (sectionKeywords.includes(kw)) {
-          color = "green";
-          type = "Section-specific Keywords";
-        } else if (lsiKeywords.includes(kw)) {
-          color = "blue";
-          type = "LSI Keywords";
-        }
-
-        tableHTML += `<tr><td>${kw}</td><td>${summary[kw]}</td><td>${type}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
-      });
-
-      document.getElementById('summary').innerHTML = tableHTML;
+    function copyToClipboard(id) {
+      const text = document.getElementById(id).innerText || document.getElementById(id).value;
+      navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard'));
     }
 
-    function copyToClipboard() {
-      const summaryText = document.getElementById('summary').innerText;
-      const textArea = document.createElement('textarea');
-      textArea.value = summaryText;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      alert('Summary copied to clipboard!');
+    function highlightKeywords() {
+      const article = document.getElementById('article').value;
+      const getKeywords = id => document.getElementById(id).value
+        .split('\n')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k);
+
+      const rawKeywords = [
+        ...getKeywords('tableKeywords'),
+        ...getKeywords('sectionKeywords'),
+        ...getKeywords('lsiKeywords')
+      ];
+
+      const sortedKeywords = [...rawKeywords].sort((a, b) => b.length - a.length);
+      const keywordColors = {};
+      const summary = {};
+      const placeholders = [];
+
+      function getRandomColor() {
+        const hue = Math.floor(Math.random() * 360);
+        return `hsl(${hue}, 80%, 80%)`;
+      }
+
+      let workingText = ` ${article} `;
+
+      for (let i = 0; i < sortedKeywords.length; i++) {
+        const kw = sortedKeywords[i];
+        const color = getRandomColor();
+        keywordColors[kw] = color;
+
+        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+        let match;
+
+        while ((match = pattern.exec(workingText)) !== null) {
+          const placeholder = `{{kw${placeholders.length}}}`;
+          placeholders.push({ placeholder, keyword: match[0], color, original: match[0], start: match.index });
+          workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
+          pattern.lastIndex = match.index + placeholder.length;
+          summary[kw] = (summary[kw] || 0) + 1;
+        }
+      }
+
+      placeholders.sort((a, b) => a.start - b.start);
+      for (let p of placeholders) {
+        workingText = workingText.replace(
+          p.placeholder,
+          `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`
+        );
+      }
+
+      document.getElementById('output').innerHTML = workingText.trim();
+
+      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
+      for (let kw of sortedKeywords) {
+        const count = summary[kw] || 0;
+        const color = keywordColors[kw] || "#eee";
+        tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+      }
+      document.getElementById('summary').innerHTML = tableHTML;
     }
   </script>
 </body>
