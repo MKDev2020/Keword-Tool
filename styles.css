@@ -1,143 +1,247 @@
-/* General Styling */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f9;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Powered Article Generator</title>
+  <style>
+    /* General Styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
 
-.container {
-  width: 80%;
-  margin: 0 auto;
-  padding: 20px;
-}
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
-/* Article Input and Output */
-#articleInput {
-  width: 100%;
-  height: 300px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  line-height: 1.6;
-  background-color: white;
-}
+    /* Article Input and Output */
+    #editor-container {
+      width: 100%;
+      height: 300px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      line-height: 1.6;
+      background-color: white;
+    }
 
-#output {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: white;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-size: 16px;
-  line-height: 1.6;
-}
+    #output {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: white;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 16px;
+      line-height: 1.6;
+    }
 
-/* Button Styling */
-button {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
+    /* Button Styling */
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-button:hover {
-  background-color: #2980b9;
-}
+    button:hover {
+      background-color: #2980b9;
+    }
 
-button:disabled {
-  background-color: #bdc3c7;
-  cursor: not-allowed;
-}
+    button:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
+    }
 
-/* Text Formatting Buttons */
-#textFormattingButtons {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
+    /* Text Formatting Buttons */
+    #textFormattingButtons {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
 
-/* Keyword Highlighting */
-.highlight {
-  padding: 0 5px;
-  color: white;
-  font-weight: bold;
-}
+    /* Keyword Highlighting */
+    .highlight {
+      padding: 0 5px;
+      color: white;
+      font-weight: bold;
+    }
 
-.bolded {
-  font-weight: bold;
-}
+    .bolded {
+      font-weight: bold;
+    }
 
-.color-box {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-}
+    .color-box {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  margin: 5px 0;
-}
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin: 5px 0;
+    }
 
-/* Font & Size Options */
-#fontOptions {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
+    /* Font & Size Options */
+    #fontOptions {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
 
-/* Font Size and Family */
-select, .font-size-btn {
-  padding: 5px;
-  margin: 5px;
-  font-size: 14px;
-  border-radius: 5px;
-}
+    /* Font Size and Family */
+    select, .font-size-btn {
+      padding: 5px;
+      margin: 5px;
+      font-size: 14px;
+      border-radius: 5px;
+    }
 
-select {
-  width: 120px;
-}
+    select {
+      width: 120px;
+    }
 
-/* Text Color and Highlighting */
-.color-palette {
-  display: flex;
-  margin-top: 20px;
-}
+    /* Text Color and Highlighting */
+    .color-palette {
+      display: flex;
+      margin-top: 20px;
+    }
 
-.color-palette div {
-  width: 30px;
-  height: 30px;
-  margin-right: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    .color-palette div {
+      width: 30px;
+      height: 30px;
+      margin-right: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
 
-/* Legend */
-#legend {
-  margin-top: 20px;
-}
+    /* Legend */
+    #legend {
+      margin-top: 20px;
+    }
 
-#legend .legend-item {
-  margin-bottom: 5px;
-}
+    #legend .legend-item {
+      margin-bottom: 5px;
+    }
 
-#legend .legend-item span {
-  margin-left: 10px;
-  font-size: 14px;
-}
+    #legend .legend-item span {
+      margin-left: 10px;
+      font-size: 14px;
+    }
 
-/* Text Area Styling */
-textarea {
-  resize: none;
-}
+    /* Text Area Styling */
+    textarea {
+      resize: none;
+    }
 
-input[type="file"] {
-  margin-top: 20px;
-}
+    input[type="file"] {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI-Powered Article Generator</h1>
+
+    <!-- Article Input Section -->
+    <textarea id="editor-container" placeholder="Start writing your article here..."></textarea>
+
+    <!-- Text Formatting Buttons -->
+    <div id="textFormattingButtons">
+      <button onclick="applyBold()">Bold</button>
+      <button onclick="applyItalic()">Italic</button>
+      <button onclick="applyUnderline()">Underline</button>
+      <button onclick="applyHighlight()">Highlight</button>
+    </div>
+
+    <!-- Font & Size Options -->
+    <div id="fontOptions">
+      <select id="fontSelect" onchange="applyFont()">
+        <option value="Arial">Arial</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Times New Roman">Times New Roman</option>
+      </select>
+
+      <select id="sizeSelect" onchange="applyFontSize()">
+        <option value="16">16px</option>
+        <option value="18">18px</option>
+        <option value="20">20px</option>
+      </select>
+    </div>
+
+    <!-- Color Palette -->
+    <div class="color-palette">
+      <div style="background-color: red;" onclick="changeColor('red')"></div>
+      <div style="background-color: blue;" onclick="changeColor('blue')"></div>
+      <div style="background-color: green;" onclick="changeColor('green')"></div>
+      <div style="background-color: yellow;" onclick="changeColor('yellow')"></div>
+    </div>
+
+    <!-- Output Section -->
+    <div id="output"></div>
+
+    <!-- File Input -->
+    <input type="file" id="fileInput" onchange="loadFile()" />
+  </div>
+
+  <script>
+    // Text formatting functions
+    function applyBold() {
+      document.execCommand('bold');
+    }
+
+    function applyItalic() {
+      document.execCommand('italic');
+    }
+
+    function applyUnderline() {
+      document.execCommand('underline');
+    }
+
+    function applyHighlight() {
+      document.execCommand('backColor', false, 'yellow');
+    }
+
+    function changeColor(color) {
+      document.execCommand('foreColor', false, color);
+    }
+
+    // Font family and size functions
+    function applyFont() {
+      const font = document.getElementById('fontSelect').value;
+      document.execCommand('fontName', false, font);
+    }
+
+    function applyFontSize() {
+      const size = document.getElementById('sizeSelect').value;
+      document.execCommand('fontSize', false, size);
+    }
+
+    // File load function
+    function loadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = function(event) {
+        document.getElementById('editor-container').innerHTML = event.target.result;
+      }
+      
+      if (file) {
+        reader.readAsText(file);
+      }
+    }
+  </script>
+</body>
+</html>
