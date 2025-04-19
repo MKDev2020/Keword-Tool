@@ -4,46 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Keyword Tool by MK</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>Keyword Tool by MK</h1>
 
-    <!-- Article Input -->
     <textarea id="articleInput" placeholder="Paste your article here..."></textarea>
 
-    <!-- Keyword Inputs -->
-    <div id="keywordInputs">
-      <h2>Keyword Groups</h2>
-      <textarea id="tableKeywords" placeholder="Table Keywords (highlighted in yellow)"></textarea>
-      <textarea id="lsiKeywords" placeholder="LSI Keywords (highlighted in light purple)"></textarea>
-      <textarea id="sectionKeywords" placeholder="Section-Specific Keywords (bolded)"></textarea>
+    <div class="keyword-section">
+      <h2>Table Keywords</h2>
+      <textarea id="tableKeywords" placeholder="Enter table keywords (one per line)..."></textarea>
+
+      <h2>LSI Keywords</h2>
+      <textarea id="lsiKeywords" placeholder="Enter LSI keywords (one per line)..."></textarea>
+
+      <h2>Section-Specific Keywords</h2>
+      <textarea id="sectionKeywords" placeholder="Enter section-specific keywords (one per line)..."></textarea>
     </div>
 
-    <!-- Text Formatting -->
-    <div id="textFormattingButtons">
-      <button onclick="formatText('bold')">Bold</button>
-      <button onclick="formatText('italic')">Italic</button>
-      <button onclick="formatText('underline')">Underline</button>
-      <button onclick="applyHeading('h1')">H1</button>
-      <button onclick="applyHeading('h2')">H2</button>
-      <button onclick="applyHeading('h3')">H3</button>
-      <button onclick="applyHeading('h4')">H4</button>
-      <button onclick="applyHeading('h5')">H5</button>
-    </div>
-
-    <!-- Process & Output -->
     <button onclick="analyzeKeywords()">Analyze Keywords</button>
-    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    <button onclick="copyToClipboard()">Copy with Formatting</button>
 
     <div id="output"></div>
-
-    <!-- Summary Section -->
-    <div id="summary">
-      <h2>Keyword Summary</h2>
-      <div id="summaryTable"></div>
-    </div>
+    <div id="summary"></div>
   </div>
 
   <script src="script.js"></script>
