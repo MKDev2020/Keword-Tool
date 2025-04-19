@@ -97,5 +97,11 @@ function copyToClipboard() {
   el.select();
   document.execCommand("copy");
   document.body.removeChild(el);
-  alert("HTML copied! Paste into a Google Doc using Ctrl+Shift+V for clean formatting.");
+  alert("✅ Copied! Now paste into a Google Doc using Ctrl+Shift+V (for clean formatting)");
 }
+
+// ✅ Add event listeners after DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("highlightBtn").addEventListener("click", highlightText);
+  document.getElementById("copyBtn").addEventListener("click", copyToClipboard);
+});
