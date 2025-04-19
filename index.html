@@ -1,4 +1,84 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Keyword Highlighter Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f9f9f9;
+    }
+
+    h1 {
+      color: #222;
+    }
+
+    textarea, input, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #output {
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 1rem;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+
+    .keyword {
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .summary-table {
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    .summary-table th, .summary-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    .color-box {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      vertical-align: middle;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Keyword Highlighter Tool</h1>
+  <label>Paste your article here:</label>
+  <textarea id="article" rows="10"></textarea>
+
+  <label>Enter Table Keywords (one per line):</label>
+  <textarea id="tableKeywords" rows="6"></textarea>
+
+  <label>Enter LSI Keywords (one per line):</label>
+  <textarea id="lsiKeywords" rows="6"></textarea>
+
+  <label>Enter Section-Specific Keywords (one per line):</label>
+  <textarea id="sectionKeywords" rows="6"></textarea>
+
+  <button onclick="highlightKeywords()">Run</button>
+
+  <h2>Highlighted Article</h2>
+  <div id="output"></div>
+
+  <h2>Keyword Summary</h2>
+  <table class="summary-table" id="summary"></table>
+
+  <script>
     function highlightKeywords() {
       const article = document.getElementById('article').value;
 
@@ -90,4 +170,6 @@
 
       document.getElementById('summary').innerHTML = tableHTML;
     }
-</script>
+  </script>
+</body>
+</html>
