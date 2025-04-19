@@ -1,100 +1,143 @@
-const colors = [
-  "#fbc531", "#4cd137", "#00a8ff", "#9c88ff", "#e84118",
-  "#00cec9", "#fab1a0", "#74b9ff", "#e84393", "#a29bfe"
-];
-
-let keywordColors = {};
-let colorIndex = 0;
-
-function getColorForKeyword(keyword) {
-  if (!keywordColors[keyword]) {
-    keywordColors[keyword] = colors[colorIndex % colors.length];
-    colorIndex++;
-  }
-  return keywordColors[keyword];
+/* General Styling */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
 }
 
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+.container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-function highlightText() {
-  const article = document.getElementById("articleText").value; // Corrected here
-const mainKws = document.getElementById("mainKws").value.trim().split("\n").filter(Boolean); // Corrected here
-const lsiKws = document.getElementById("lsiKws").value.trim().split("\n").filter(Boolean); // Corrected here
-const sectionKws = document.getElementById("sectionKws").value.trim().split("\n").filter(Boolean); // Corrected here
-
-  let output = article;
-
-  keywordColors = {};
-  colorIndex = 0;
-
-  const allKeywords = [];
-
-  mainKws.forEach(kw => {
-    const color = getColorForKeyword(kw);
-    const regex = new RegExp(`\\b(${escapeRegExp(kw)})\\b`, "gi");
-    output = output.replace(regex, `<span class="highlight" style="background-color:${color}">$1</span>`);
-    allKeywords.push({ type: "Main", kw, color });
-  });
-
-  lsiKws.forEach(kw => {
-    const color = "#dcd6f7";
-    const regex = new RegExp(`\\b(${escapeRegExp(kw)})\\b`, "gi");
-    output = output.replace(regex, `<span class="highlight" style="background-color:${color}">$1</span>`);
-    allKeywords.push({ type: "LSI", kw, color });
-  });
-
-  sectionKws.forEach(kw => {
-    const regex = new RegExp(`\\b(${escapeRegExp(kw)})\\b`, "gi");
-    output = output.replace(regex, `<span class="bolded">$1</span>`);
-    allKeywords.push({ type: "Section", kw, color: "bold" });
-  });
-
-  document.getElementById("output").innerHTML = output;
-  renderLegend(allKeywords);
+/* Article Input and Output */
+#articleInput {
+  width: 100%;
+  height: 300px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: white;
 }
 
-function renderLegend(keywords) {
-  const legendContainer = document.getElementById("legend");
-  legendContainer.innerHTML = "";
-
-  // Remove duplicates
-  const unique = [];
-  keywords.forEach(({ type, kw, color }) => {
-    if (!unique.find(k => k.kw === kw)) {
-      unique.push({ type, kw, color });
-    }
-  });
-
-  // Sort by type: Main → LSI → Section
-  const typeOrder = { "Main": 0, "LSI": 1, "Section": 2 };
-  unique.sort((a, b) => typeOrder[a.type] - typeOrder[b.type]);
-
-  unique.forEach(({ kw, color }) => {
-    const legendItem = document.createElement("div");
-    legendItem.className = "legend-item";
-
-    const colorBox = document.createElement("div");
-    colorBox.className = "color-box";
-    colorBox.style.background = (color === "bold") ? "#2f3640" : color;
-
-    const label = document.createElement("span");
-    label.textContent = kw;
-
-    legendItem.appendChild(colorBox);
-    legendItem.appendChild(label);
-
-    legendContainer.appendChild(legendItem);
-  });
+#output {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
-function copyToClipboard() {
-  const el = document.createElement("textarea");
-  el.value = document.getElementById("output").innerHTML;
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand("copy");
-  document.body.removeChild(el);
-  alert("HTML copied! Paste into a Google Doc using Ctrl+Shift+V for clean formatting.");
+/* Button Styling */
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* Text Formatting Buttons */
+#textFormattingButtons {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Keyword Highlighting */
+.highlight {
+  padding: 0 5px;
+  color: white;
+  font-weight: bold;
+}
+
+.bolded {
+  font-weight: bold;
+}
+
+.color-box {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+}
+
+/* Font & Size Options */
+#fontOptions {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Font Size and Family */
+select, .font-size-btn {
+  padding: 5px;
+  margin: 5px;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+select {
+  width: 120px;
+}
+
+/* Text Color and Highlighting */
+.color-palette {
+  display: flex;
+  margin-top: 20px;
+}
+
+.color-palette div {
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Legend */
+#legend {
+  margin-top: 20px;
+}
+
+#legend .legend-item {
+  margin-bottom: 5px;
+}
+
+#legend .legend-item span {
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+/* Text Area Styling */
+textarea {
+  resize: none;
+}
+
+input[type="file"] {
+  margin-top: 20px;
 }
