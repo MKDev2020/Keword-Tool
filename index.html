@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Keyword Tool by MK</title>
   <style>
     body {
@@ -10,20 +10,18 @@
       margin: 2rem;
       background: #f9f9f9;
     }
-    h1, h2 {
+
+    h1 {
       color: #222;
     }
+
     textarea, input, button {
       width: 100%;
       margin: 10px 0;
       padding: 10px;
       font-size: 16px;
     }
-    .checkbox-row {
-      display: flex;
-      gap: 1rem;
-      margin: 10px 0;
-    }
+
     #output {
       border: 1px solid #ccc;
       background: #fff;
@@ -31,21 +29,25 @@
       margin-top: 20px;
       white-space: pre-wrap;
     }
+
     .keyword {
       padding: 2px 4px;
       border-radius: 4px;
       font-weight: bold;
     }
+
     .summary-table {
       margin-top: 20px;
       border-collapse: collapse;
       width: 100%;
     }
+
     .summary-table th, .summary-table td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: left;
     }
+
     .color-box {
       display: inline-block;
       width: 12px;
@@ -54,11 +56,20 @@
       vertical-align: middle;
       border-radius: 2px;
     }
-    .btn-copy {
-      margin-top: 10px;
-      padding: 8px 12px;
-      font-size: 14px;
-      cursor: pointer;
+
+    .table-kw { background-color: #fff3b0; }
+    .lsi-kw { background-color: #add8e6; }
+    .section-kw { background-color: #b0f2b6; }
+
+    .hidden-highlight span.table-kw,
+    .hidden-highlight span.lsi-kw,
+    .hidden-highlight span.section-kw {
+      background: none !important;
+      font-weight: normal;
+    }
+
+    .toggle-group {
+      margin: 10px 0;
     }
   </style>
 </head>
@@ -68,103 +79,110 @@
   <label>Paste your article here:</label>
   <textarea id="article" rows="10"></textarea>
 
-  <label>Table Keywords (Yellow, one per line):</label>
+  <label>Table Keywords (one per line):</label>
   <textarea id="tableKeywords" rows="4"></textarea>
 
-  <label>LSI Keywords (Blue, one per line):</label>
+  <label>LSI Keywords (one per line):</label>
   <textarea id="lsiKeywords" rows="4"></textarea>
 
-  <label>Section-specific Keywords (Green, one per line):</label>
+  <label>Section-Specific Keywords (one per line):</label>
   <textarea id="sectionKeywords" rows="4"></textarea>
 
-  <div class="checkbox-row">
-    <label><input type="checkbox" id="useTable" checked /> Table Keywords</label>
-    <label><input type="checkbox" id="useLSI" checked /> LSI Keywords</label>
-    <label><input type="checkbox" id="useSection" checked /> Section-specific Keywords</label>
+  <div class="toggle-group">
+    <label><input type="checkbox" id="toggleTableKW" checked /> Show Table Keywords</label><br/>
+    <label><input type="checkbox" id="toggleLSIKW" checked /> Show LSI Keywords</label><br/>
+    <label><input type="checkbox" id="toggleSectionKW" checked /> Show Section Keywords</label>
   </div>
 
   <button onclick="highlightKeywords()">Run</button>
+  <button onclick="copySummary()">Copy Summary</button>
 
   <h2>Analyzed Article</h2>
   <div id="output"></div>
 
   <h2>Keyword Summary</h2>
-  <button class="btn-copy" onclick="copySummaryToClipboard()">Copy Summary to Clipboard</button>
   <table class="summary-table" id="summary"></table>
 
   <script>
-    function highlightKeywords() {
-      const article = document.getElementById('article').value;
-      const useTable = document.getElementById('useTable').checked;
-      const useLSI = document.getElementById('useLSI').checked;
-      const useSection = document.getElementById('useSection').checked;
-
-      const tableKeywords = useTable ? document.getElementById('tableKeywords').value.split('\n').map(k => k.trim()).filter(Boolean) : [];
-      const lsiKeywords = useLSI ? document.getElementById('lsiKeywords').value.split('\n').map(k => k.trim()).filter(Boolean) : [];
-      const sectionKeywords = useSection ? document.getElementById('sectionKeywords').value.split('\n').map(k => k.trim()).filter(Boolean) : [];
-
-      const allKeywords = [
-        ...tableKeywords.map(k => ({ text: k, type: 'Table', color: '#fff3b0' })),
-        ...lsiKeywords.map(k => ({ text: k, type: 'LSI', color: '#d0e1ff' })),
-        ...sectionKeywords.map(k => ({ text: k, type: 'Section', color: '#c7f5c4' }))
-      ].sort((a, b) => b.text.length - a.text.length);
-
-      const keywordSummary = {};
-      let workingText = ` ${article} `;
-      const placeholders = [];
-
-      for (let i = 0; i < allKeywords.length; i++) {
-        const { text, color, type } = allKeywords[i];
-        const escapedKW = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const pattern = new RegExp(`(?<!\\w)${escapedKW}(?!\\w)`, 'gi');
-        let match;
-
-        while ((match = pattern.exec(workingText)) !== null) {
-          const placeholder = `{{kw${placeholders.length}}}`;
-          placeholders.push({
-            placeholder,
-            original: match[0],
-            color,
-            keyword: text.toLowerCase(),
-            type,
-            start: match.index
-          });
-
-          workingText = workingText.slice(0, match.index) + placeholder + workingText.slice(match.index + match[0].length);
-          pattern.lastIndex = match.index + placeholder.length;
-
-          keywordSummary[text.toLowerCase()] = keywordSummary[text.toLowerCase()] || { count: 0, color, type, original: text };
-          keywordSummary[text.toLowerCase()].count++;
-        }
-      }
-
-      placeholders.sort((a, b) => a.start - b.start);
-      for (let p of placeholders) {
-        workingText = workingText.replace(p.placeholder, `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`);
-      }
-
-      document.getElementById('output').innerHTML = workingText.trim();
-
-      // Summary table
-      const totalWords = article.split(/\s+/).length;
-      let tableHTML = '<tr><th>Keyword</th><th>Count</th><th>Density (%)</th><th>Type</th><th>Color</th></tr>';
-
-      Object.values(keywordSummary).forEach(({ original, count, color, type }) => {
-        const density = ((count / totalWords) * 100).toFixed(2);
-        tableHTML += `<tr><td>${original}</td><td>${count}</td><td>${density}</td><td>${type}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
-      });
-
-      document.getElementById('summary').innerHTML = tableHTML;
+    function getDensity(count, totalWords) {
+      return ((count / totalWords) * 100).toFixed(2) + '%';
     }
 
-    function copySummaryToClipboard() {
-      const rows = document.querySelectorAll('#summary tr');
-      const lines = [];
-      rows.forEach((row, i) => {
-        const cells = Array.from(row.children).map(cell => cell.innerText);
-        lines.push(cells.join('\t'));
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlightKeywords() {
+      const articleText = document.getElementById('article').value;
+      const totalWords = articleText.trim().split(/\s+/).length;
+      let outputText = articleText;
+
+      const types = [
+        { id: 'tableKeywords', className: 'table-kw', label: 'Table Keyword' },
+        { id: 'lsiKeywords', className: 'lsi-kw', label: 'LSI Keyword' },
+        { id: 'sectionKeywords', className: 'section-kw', label: 'Section Keyword' }
+      ];
+
+      const allKeywords = [];
+      const keywordMap = {};
+
+      types.forEach(type => {
+        const keywords = document.getElementById(type.id).value
+          .split('\n')
+          .map(k => k.trim().toLowerCase())
+          .filter(k => k);
+        keywords.forEach(k => {
+          allKeywords.push({ word: k, className: type.className, type: type.label });
+        });
       });
-      navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Summary copied to clipboard!'));
+
+      // Sort by keyword length descending to avoid partial match conflicts
+      allKeywords.sort((a, b) => b.word.length - a.word.length);
+
+      const summary = [];
+      const usedMap = {};
+
+      allKeywords.forEach(({ word, className, type }) => {
+        const re = new RegExp(`(?<!\\w)${escapeRegExp(word)}(?!\\w)`, 'gi');
+        let count = 0;
+        outputText = outputText.replace(re, match => {
+          count++;
+          return `<span class="keyword ${className}">${match}</span>`;
+        });
+        summary.push({ word, count, className, type });
+      });
+
+      document.getElementById('output').innerHTML = outputText;
+
+      const grouped = {};
+      summary.forEach(item => {
+        if (!grouped[item.type]) grouped[item.type] = [];
+        grouped[item.type].push(item);
+      });
+
+      let tableHTML = '<tr><th>Keyword</th><th>Count</th><th>Density</th><th>Type</th><th>Color</th></tr>';
+      for (let group in grouped) {
+        grouped[group].forEach(({ word, count, className, type }) => {
+          tableHTML += `<tr><td>${word}</td><td>${count}</td><td>${getDensity(count, totalWords)}</td><td>${type}</td><td><span class="color-box ${className}"></span></td></tr>`;
+        });
+      }
+      document.getElementById('summary').innerHTML = tableHTML;
+
+      // Apply toggles only to highlights (not summary)
+      document.getElementById('output').classList.remove('hidden-highlight');
+      document.querySelectorAll('.table-kw').forEach(el => el.style.backgroundColor = document.getElementById('toggleTableKW').checked ? '#fff3b0' : 'transparent');
+      document.querySelectorAll('.lsi-kw').forEach(el => el.style.backgroundColor = document.getElementById('toggleLSIKW').checked ? '#add8e6' : 'transparent');
+      document.querySelectorAll('.section-kw').forEach(el => el.style.backgroundColor = document.getElementById('toggleSectionKW').checked ? '#b0f2b6' : 'transparent');
+    }
+
+    function copySummary() {
+      const table = document.getElementById('summary');
+      let text = '';
+      for (let row of table.rows) {
+        const cells = [...row.cells].map(cell => cell.innerText || cell.textContent);
+        text += cells.join('\t') + '\n';
+      }
+      navigator.clipboard.writeText(text).then(() => alert('Summary copied to clipboard.'));
     }
   </script>
 </body>
