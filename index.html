@@ -3,50 +3,49 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Keyword Highlighter Tool</title>
+  <title>Keyword Tool by MK</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 2rem;
       background: #f9f9f9;
     }
-
+    h1, h2 {
+      color: #222;
+    }
     textarea, input, button {
       width: 100%;
       margin: 10px 0;
       padding: 10px;
       font-size: 16px;
     }
-
-    h2 {
-      margin-top: 2rem;
+    .checkbox-row {
+      display: flex;
+      gap: 1rem;
+      margin: 10px 0;
     }
-
     #output {
       border: 1px solid #ccc;
       background: #fff;
       padding: 1rem;
+      margin-top: 20px;
       white-space: pre-wrap;
     }
-
     .keyword {
       padding: 2px 4px;
       border-radius: 4px;
       font-weight: bold;
     }
-
     .summary-table {
       margin-top: 20px;
       border-collapse: collapse;
       width: 100%;
     }
-
     .summary-table th, .summary-table td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: left;
     }
-
     .color-box {
       display: inline-block;
       width: 12px;
@@ -55,59 +54,69 @@
       vertical-align: middle;
       border-radius: 2px;
     }
+    .btn-copy {
+      margin-top: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>Keyword Highlighter Tool</h1>
+  <h1>Keyword Tool by MK</h1>
 
   <label>Paste your article here:</label>
   <textarea id="article" rows="10"></textarea>
 
-  <label>Enter Table Keywords (yellow):</label>
+  <label>Table Keywords (Yellow, one per line):</label>
   <textarea id="tableKeywords" rows="4"></textarea>
 
-  <label>Enter LSI Keywords (blue):</label>
+  <label>LSI Keywords (Blue, one per line):</label>
   <textarea id="lsiKeywords" rows="4"></textarea>
 
-  <label>Enter Section-Specific Keywords (green):</label>
+  <label>Section-specific Keywords (Green, one per line):</label>
   <textarea id="sectionKeywords" rows="4"></textarea>
+
+  <div class="checkbox-row">
+    <label><input type="checkbox" id="useTable" checked /> Table Keywords</label>
+    <label><input type="checkbox" id="useLSI" checked /> LSI Keywords</label>
+    <label><input type="checkbox" id="useSection" checked /> Section-specific Keywords</label>
+  </div>
 
   <button onclick="highlightKeywords()">Run</button>
 
-  <h2>Highlighted Article</h2>
+  <h2>Analyzed Article</h2>
   <div id="output"></div>
 
   <h2>Keyword Summary</h2>
+  <button class="btn-copy" onclick="copySummaryToClipboard()">Copy Summary to Clipboard</button>
   <table class="summary-table" id="summary"></table>
 
   <script>
     function highlightKeywords() {
-      const articleText = document.getElementById('article').value;
-      const totalWords = articleText.trim().split(/\s+/).length;
+      const article = document.getElementById('article').value;
+      const useTable = document.getElementById('useTable').checked;
+      const useLSI = document.getElementById('useLSI').checked;
+      const useSection = document.getElementById('useSection').checked;
 
-      const getKeywords = (id, type, color) => {
-        return document.getElementById(id).value
-          .split('\n')
-          .map(kw => kw.trim().toLowerCase())
-          .filter(Boolean)
-          .map(kw => ({ kw, type, color }));
-      };
+      const tableKeywords = useTable ? document.getElementById('tableKeywords').value.split('\n').map(k => k.trim()).filter(Boolean) : [];
+      const lsiKeywords = useLSI ? document.getElementById('lsiKeywords').value.split('\n').map(k => k.trim()).filter(Boolean) : [];
+      const sectionKeywords = useSection ? document.getElementById('sectionKeywords').value.split('\n').map(k => k.trim()).filter(Boolean) : [];
 
-      const keywords = [
-        ...getKeywords('tableKeywords', 'Table', '#ffff99'),
-        ...getKeywords('lsiKeywords', 'LSI', '#b3d9ff'),
-        ...getKeywords('sectionKeywords', 'Section-specific', '#b3ffcc')
-      ];
+      const allKeywords = [
+        ...tableKeywords.map(k => ({ text: k, type: 'Table', color: '#fff3b0' })),
+        ...lsiKeywords.map(k => ({ text: k, type: 'LSI', color: '#d0e1ff' })),
+        ...sectionKeywords.map(k => ({ text: k, type: 'Section', color: '#c7f5c4' }))
+      ].sort((a, b) => b.text.length - a.text.length);
 
-      const sortedKeywords = [...keywords].sort((a, b) => b.kw.length - a.kw.length);
-
-      let workingText = ` ${articleText} `;
+      const keywordSummary = {};
+      let workingText = ` ${article} `;
       const placeholders = [];
-      const keywordCounts = {};
 
-      for (let i = 0; i < sortedKeywords.length; i++) {
-        const { kw, type, color } = sortedKeywords[i];
-        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+      for (let i = 0; i < allKeywords.length; i++) {
+        const { text, color, type } = allKeywords[i];
+        const escapedKW = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const pattern = new RegExp(`(?<!\\w)${escapedKW}(?!\\w)`, 'gi');
         let match;
 
         while ((match = pattern.exec(workingText)) !== null) {
@@ -115,57 +124,47 @@
           placeholders.push({
             placeholder,
             original: match[0],
-            keyword: kw,
-            type,
             color,
+            keyword: text.toLowerCase(),
+            type,
             start: match.index
           });
 
           workingText = workingText.slice(0, match.index) + placeholder + workingText.slice(match.index + match[0].length);
           pattern.lastIndex = match.index + placeholder.length;
 
-          keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
+          keywordSummary[text.toLowerCase()] = keywordSummary[text.toLowerCase()] || { count: 0, color, type, original: text };
+          keywordSummary[text.toLowerCase()].count++;
         }
       }
 
-      // Replace placeholders with highlighted spans
       placeholders.sort((a, b) => a.start - b.start);
       for (let p of placeholders) {
-        workingText = workingText.replace(
-          p.placeholder,
-          `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`
-        );
+        workingText = workingText.replace(p.placeholder, `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`);
       }
 
       document.getElementById('output').innerHTML = workingText.trim();
 
-      // Build summary table
-      let tableHTML = `<tr>
-        <th>Keyword</th>
-        <th>Count</th>
-        <th>Density</th>
-        <th>Type</th>
-        <th>Color</th>
-      </tr>`;
+      // Summary table
+      const totalWords = article.split(/\s+/).length;
+      let tableHTML = '<tr><th>Keyword</th><th>Count</th><th>Density (%)</th><th>Type</th><th>Color</th></tr>';
 
-      const seen = new Set();
-      for (let { kw, type, color } of sortedKeywords) {
-        if (seen.has(kw)) continue;
-        seen.add(kw);
-
-        const count = keywordCounts[kw] || 0;
-        const density = totalWords ? ((count / totalWords) * 100).toFixed(2) + '%' : '0%';
-
-        tableHTML += `<tr>
-          <td>${kw}</td>
-          <td>${count}</td>
-          <td>${density}</td>
-          <td>${type}</td>
-          <td><span class="color-box" style="background:${color}"></span></td>
-        </tr>`;
-      }
+      Object.values(keywordSummary).forEach(({ original, count, color, type }) => {
+        const density = ((count / totalWords) * 100).toFixed(2);
+        tableHTML += `<tr><td>${original}</td><td>${count}</td><td>${density}</td><td>${type}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+      });
 
       document.getElementById('summary').innerHTML = tableHTML;
+    }
+
+    function copySummaryToClipboard() {
+      const rows = document.querySelectorAll('#summary tr');
+      const lines = [];
+      rows.forEach((row, i) => {
+        const cells = Array.from(row.children).map(cell => cell.innerText);
+        lines.push(cells.join('\t'));
+      });
+      navigator.clipboard.writeText(lines.join('\n')).then(() => alert('Summary copied to clipboard!'));
     }
   </script>
 </body>
