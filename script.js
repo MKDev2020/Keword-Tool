@@ -72,12 +72,13 @@ function displaySummary() {
   }
 }
 
+// Add event listener to the Run button for triggering the highlightKeywords function
+document.getElementById('runButton').addEventListener('click', highlightKeywords);
+
+// For the copy button functionality:
 function copyToClipboard() {
   const text = document.getElementById('output').innerText;
   navigator.clipboard.writeText(text).then(() => {
     alert('Text copied to clipboard!');
   });
 }
-
-// Add event listener to the Run button for triggering the highlightKeywords function
-document.getElementById('runButton').addEventListener('click', highlightKeywords);
