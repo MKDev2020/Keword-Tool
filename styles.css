@@ -27,14 +27,15 @@ textarea {
 
 /* Article Box - Largest */
 #article {
-  height: 400px; /* Increase height for article box */
+  height: 500px; /* Increased height for the article box */
 }
 
-/* Smaller Keyword Boxes */
+/* Larger Keyword Boxes */
 #tableKeywords, #lsiKeywords, #sectionKeywords {
-  height: 150px; /* Make keyword boxes smaller */
+  height: 300px; /* Bigger keyword boxes */
 }
 
+/* Output Box Styles */
 #output {
   border: 1px solid #ccc;
   background: #fff;
