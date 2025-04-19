@@ -19,10 +19,10 @@ function escapeRegExp(string) {
 }
 
 function highlightText() {
-  const article = document.getElementById("articleInput").value;
-  const mainKws = document.getElementById("mainKeywords").value.trim().split("\n").filter(Boolean);
-  const lsiKws = document.getElementById("lsiKeywords").value.trim().split("\n").filter(Boolean);
-  const sectionKws = document.getElementById("sectionKeywords").value.trim().split("\n").filter(Boolean);
+  const article = document.getElementById("articleText").value;  // Match with HTML ID
+  const mainKws = document.getElementById("mainKws").value.trim().split("\n").filter(Boolean);  // Match with HTML ID
+  const lsiKws = document.getElementById("lsiKws").value.trim().split("\n").filter(Boolean);  // Match with HTML ID
+  const sectionKws = document.getElementById("sectionKws").value.trim().split("\n").filter(Boolean);  // Match with HTML ID
 
   let output = article;
 
@@ -59,13 +59,17 @@ function renderLegend(keywords) {
   const legendContainer = document.getElementById("legend");
   legendContainer.innerHTML = "";
 
+  // Remove duplicates
   const unique = [];
-
   keywords.forEach(({ type, kw, color }) => {
     if (!unique.find(k => k.kw === kw)) {
       unique.push({ type, kw, color });
     }
   });
+
+  // Sort by type: Main → LSI → Section
+  const typeOrder = { "Main": 0, "LSI": 1, "Section": 2 };
+  unique.sort((a, b) => typeOrder[a.type] - typeOrder[b.type]);
 
   unique.forEach(({ kw, color }) => {
     const legendItem = document.createElement("div");
@@ -73,12 +77,7 @@ function renderLegend(keywords) {
 
     const colorBox = document.createElement("div");
     colorBox.className = "color-box";
-
-    if (color === "bold") {
-      colorBox.style.background = "#2f3640";
-    } else {
-      colorBox.style.background = color;
-    }
+    colorBox.style.background = (color === "bold") ? "#2f3640" : color;
 
     const label = document.createElement("span");
     label.textContent = kw;
@@ -97,11 +96,9 @@ function copyToClipboard() {
   el.select();
   document.execCommand("copy");
   document.body.removeChild(el);
-  alert("✅ Copied! Now paste into a Google Doc using Ctrl+Shift+V (for clean formatting)");
+  alert("HTML copied! Paste into a Google Doc using Ctrl+Shift+V for clean formatting.");
 }
 
-// ✅ Add event listeners after DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("highlightBtn").addEventListener("click", highlightText);
-  document.getElementById("copyBtn").addEventListener("click", copyToClipboard);
-});
+// Add event listeners for button clicks
+document.getElementById("highlightBtn").addEventListener("click", highlightText);
+document.getElementById("copyBtn").addEventListener("click", copyToClipboard);
