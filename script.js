@@ -16,66 +16,75 @@ function highlightKeywords() {
     .map(k => k.trim().toLowerCase())
     .filter(k => k);
 
-  // Sort keywords by length for more accurate highlighting
-  const sortedKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
+  // Define specific colors for each type of keyword list
+  const keywordColors = {
+    table: '#FFD700',  // Gold for Table Keywords
+    lsi: '#98C7E4',    // Light Blue for LSI Keywords
+    section: '#D1F7A1' // Light Green for Section Keywords
+  };
 
-  const usedSpans = [];
-  const keywordColors = {};
-  const summary = {};
+  const summary = {
+    table: {},
+    lsi: {},
+    section: {}
+  };
 
-  function getRandomColor() {
-    const hue = Math.floor(Math.random() * 360);
-    return `hsl(${hue}, 80%, 80%)`;
+  function highlightKeyword(kw, color) {
+    const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+    return (text) => {
+      return text.replace(pattern, `<span class="keyword" style="background-color:${color}">${kw}</span>`);
+    };
   }
 
   let workingText = ` ${article} `;
-  const placeholders = [];
+  let highlightedText = workingText;
 
-  // Combine all keywords into one array
-  const allKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
+  // Highlight table keywords
+  tableKeywords.forEach(kw => {
+    highlightedText = highlightKeyword(kw, keywordColors.table)(highlightedText);
+    summary.table[kw] = (summary.table[kw] || 0) + 1;
+  });
 
-  for (let i = 0; i < allKeywords.length; i++) {
-    const kw = allKeywords[i];
-    const color = getRandomColor();
-    keywordColors[kw] = color;
+  // Highlight LSI keywords
+  lsiKeywords.forEach(kw => {
+    highlightedText = highlightKeyword(kw, keywordColors.lsi)(highlightedText);
+    summary.lsi[kw] = (summary.lsi[kw] || 0) + 1;
+  });
 
-    const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
-    let match;
+  // Highlight section-specific keywords
+  sectionKeywords.forEach(kw => {
+    highlightedText = highlightKeyword(kw, keywordColors.section)(highlightedText);
+    summary.section[kw] = (summary.section[kw] || 0) + 1;
+  });
 
-    while ((match = pattern.exec(workingText)) !== null) {
-      const placeholder = `{{kw${placeholders.length}}}`;
-      placeholders.push({
-        placeholder,
-        keyword: match[0],
-        color,
-        original: match[0],
-        start: match.index
-      });
+  // Display highlighted article
+  document.getElementById('output').innerHTML = highlightedText.trim();
 
-      workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
-      pattern.lastIndex = match.index + placeholder.length;
+  // Build the summary table
+  let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th><th>Type</th></tr>";
 
-      summary[kw] = (summary[kw] || 0) + 1;
-    }
+  function buildSummaryRow(kw, count, color, type) {
+    return `<tr>
+              <td>${kw}</td>
+              <td>${count}</td>
+              <td><span class="color-box" style="background:${color}"></span></td>
+              <td>${type}</td>
+            </tr>`;
   }
 
-  // Replace placeholders with spans for actual keyword highlighting
-  placeholders.sort((a, b) => a.start - b.start);
-  for (let p of placeholders) {
-    workingText = workingText.replace(
-      p.placeholder,
-      `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`
-    );
+  // Add table keyword rows
+  for (let kw in summary.table) {
+    tableHTML += buildSummaryRow(kw, summary.table[kw], keywordColors.table, 'Table Keyword');
   }
 
-  document.getElementById('output').innerHTML = workingText.trim();
+  // Add LSI keyword rows
+  for (let kw in summary.lsi) {
+    tableHTML += buildSummaryRow(kw, summary.lsi[kw], keywordColors.lsi, 'LSI Keyword');
+  }
 
-  // Build the summary table with keyword counts
-  let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
-  for (let kw of sortedKeywords) {
-    const count = summary[kw] || 0;
-    const color = keywordColors[kw] || "#eee";
-    tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+  // Add section keyword rows
+  for (let kw in summary.section) {
+    tableHTML += buildSummaryRow(kw, summary.section[kw], keywordColors.section, 'Section Keyword');
   }
 
   document.getElementById('summary').innerHTML = tableHTML;
