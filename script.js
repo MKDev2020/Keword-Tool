@@ -1,5 +1,4 @@
 function highlightKeywords() {
-  // Get article content and keyword lists
   const article = document.getElementById("article").value.toLowerCase();
   const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(keyword => keyword.trim().toLowerCase());
   const lsiKeywords = document.getElementById("lsiKeywords").value.split("\n").map(keyword => keyword.trim().toLowerCase());
@@ -57,27 +56,43 @@ function highlightKeywords() {
   });
 }
 
-// Helper function to get a color for a keyword
 function getColorForKeyword(keyword) {
-  // You can define your own color logic here based on the keyword
+  const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(k => k.trim().toLowerCase());
+  const lsiKeywords = document.getElementById("lsiKeywords").value.split("\n").map(k => k.trim().toLowerCase());
+  const sectionKeywords = document.getElementById("sectionKeywords").value.split("\n").map(k => k.trim().toLowerCase());
+
   if (tableKeywords.includes(keyword)) {
-    return "#FFD700"; // Yellow for table-related keywords
+    return '#FFD700'; // Yellow for table-related keywords
   } else if (lsiKeywords.includes(keyword)) {
-    return "#98C7E4"; // Light Blue for LSI keywords
+    return '#98C7E4'; // Light Blue for LSI keywords
   } else if (sectionKeywords.includes(keyword)) {
-    return "#D1F7A1"; // Light Green for section-related keywords
+    return '#D1F7A1'; // Light Green for section-specific keywords
   }
-  return "#C0C0C0"; // Default color for other keywords
+  return '#FFFFFF'; // Default color
 }
 
-// Helper function to get the type of keyword
 function getKeywordType(keyword) {
+  const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(k => k.trim().toLowerCase());
+  const lsiKeywords = document.getElementById("lsiKeywords").value.split("\n").map(k => k.trim().toLowerCase());
+  const sectionKeywords = document.getElementById("sectionKeywords").value.split("\n").map(k => k.trim().toLowerCase());
+
   if (tableKeywords.includes(keyword)) {
-    return "Table Keyword";
+    return 'Table Keyword';
   } else if (lsiKeywords.includes(keyword)) {
-    return "LSI Keyword";
+    return 'LSI Keyword';
   } else if (sectionKeywords.includes(keyword)) {
-    return "Section Keyword";
+    return 'Section Keyword';
   }
-  return "Unknown Type";
+  return 'Unknown';
+}
+
+function copyToClipboard() {
+  const outputText = document.getElementById("output").innerText;
+  const textArea = document.createElement("textarea");
+  textArea.value = outputText;
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textArea);
+  alert('Copied to clipboard!');
 }
