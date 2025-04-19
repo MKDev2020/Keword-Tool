@@ -1,17 +1,19 @@
-document.getElementById("runButton").addEventListener("click", highlightKeywords); // Ensure the button triggers the function
+document.getElementById("runButton").addEventListener("click", highlightKeywords);
 
 function highlightKeywords() {
   const article = document.getElementById("article").value.toLowerCase();
-  const tableKeywords = document.getElementById("tableKeywords").value.split("\n").map(keyword => keyword.trim().toLowerCase());
-  const lsiKeywords = document.getElementById("lsiKeywords").value.split("\n").map(keyword => keyword.trim().toLowerCase());
-  const sectionKeywords = document.getElementById("sectionKeywords").value.split("\n").map(keyword => keyword.trim().toLowerCase());
+  
+  // Split keywords and clean them up
+  const tableKeywords = cleanKeywords(document.getElementById("tableKeywords").value);
+  const lsiKeywords = cleanKeywords(document.getElementById("lsiKeywords").value);
+  const sectionKeywords = cleanKeywords(document.getElementById("sectionKeywords").value);
 
   const allKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
   
-  let output = article; // The text will be modified here to highlight keywords
+  let output = article;
   const keywordCounts = {}; // To keep track of counts for each keyword
 
-  // Clear previous summary in the table
+  // Clear previous summary
   const summaryTable = document.getElementById("summary");
   summaryTable.innerHTML = `
     <tr>
@@ -22,28 +24,27 @@ function highlightKeywords() {
     </tr>
   `;
 
-  // Process each keyword
+  // Process each keyword and highlight
   allKeywords.forEach(keyword => {
     if (keyword !== "") {
-      const keywordRegex = new RegExp(`\\b${keyword}\\b`, "g"); // Match whole words only
+      const keywordRegex = new RegExp(`\\b${keyword}\\b`, "g");
       let count = 0;
 
-      // Highlight and count keywords
       output = output.replace(keywordRegex, (match) => {
-        count++; // Increment count for each match
+        count++;
         return `<span class="keyword" style="background-color: ${getColorForKeyword(keyword)};">${match}</span>`;
       });
 
       if (count > 0) {
-        keywordCounts[keyword] = count; // Save the count for the keyword
+        keywordCounts[keyword] = count;
       }
     }
   });
 
-  // Display the output with highlighted keywords
+  // Display the highlighted article
   document.getElementById("output").innerHTML = output;
 
-  // Update the summary table with the keyword counts
+  // Update summary table with keyword counts
   allKeywords.forEach(keyword => {
     if (keywordCounts[keyword] > 0) {
       const row = document.createElement("tr");
@@ -56,6 +57,12 @@ function highlightKeywords() {
       summaryTable.appendChild(row);
     }
   });
+}
+
+function cleanKeywords(input) {
+  return input.split("\n")
+    .map(keyword => keyword.trim().toLowerCase())
+    .filter(keyword => keyword !== ""); // Remove empty lines
 }
 
 function getColorForKeyword(keyword) {
