@@ -4,9 +4,141 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Keyword Highlighter Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f9f9f9;
+    }
+
+    h1 {
+      color: #222;
+    }
+
+    textarea, input, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    #output {
+      border: 1px solid #ccc;
+      background: #fff;
+      padding: 1rem;
+      margin-top: 20px;
+      white-space: pre-wrap;
+    }
+
+    .keyword {
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .summary-table {
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    .summary-table th, .summary-table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    .color-box {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      vertical-align: middle;
+      border-radius: 2px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to the Keyword Highlighter Tool</h1>
-  <p>This is a placeholder page. The real app will go here!</p>
+  <h1>Keyword Highlighter Tool</h1>
+  <label>Paste your article here:</label>
+  <textarea id="article" rows="10"></textarea>
+
+  <label>Enter keywords (one per line):</label>
+  <textarea id="keywords" rows="6"></textarea>
+
+  <button onclick="highlightKeywords()">Highlight Keywords</button>
+
+  <h2>Highlighted Article</h2>
+  <div id="output"></div>
+
+  <h2>Keyword Summary</h2>
+  <table class="summary-table" id="summary"></table>
+
+  <script>
+    function highlightKeywords() {
+      const article = document.getElementById('article').value;
+      const rawKeywords = document.getElementById('keywords').value
+        .split('\n')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k);
+
+      const sortedKeywords = [...rawKeywords].sort((a, b) => b.length - a.length);
+      const usedSpans = [];
+      const keywordColors = {};
+      const summary = {};
+
+      function getRandomColor() {
+        const hue = Math.floor(Math.random() * 360);
+        return `hsl(${hue}, 80%, 80%)`;
+      }
+
+      let workingText = ` ${article} `;
+      const placeholders = [];
+
+      for (let i = 0; i < sortedKeywords.length; i++) {
+        const kw = sortedKeywords[i];
+        const color = getRandomColor();
+        keywordColors[kw] = color;
+
+        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+        let match;
+
+        while ((match = pattern.exec(workingText)) !== null) {
+          const placeholder = `{{kw${placeholders.length}}}`;
+          placeholders.push({
+            placeholder,
+            keyword: match[0],
+            color,
+            original: match[0],
+            start: match.index
+          });
+
+          workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
+          pattern.lastIndex = match.index + placeholder.length;
+
+          summary[kw] = (summary[kw] || 0) + 1;
+        }
+      }
+
+      // Replace placeholders with spans
+      placeholders.sort((a, b) => a.start - b.start);
+      for (let p of placeholders) {
+        workingText = workingText.replace(
+          p.placeholder,
+          `<span class="keyword" style="background-color:${p.color}">${p.original}</span>`
+        );
+      }
+
+      document.getElementById('output').innerHTML = workingText.trim();
+
+      // Build summary table
+      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
+      for (let kw of rawKeywords) {
+        const count = summary[kw] || 0;
+        const color = keywordColors[kw] || "#eee";
+        tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+      }
+
+      document.getElementById('summary').innerHTML = tableHTML;
+    }
+  </script>
 </body>
 </html>
