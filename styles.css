@@ -1,3 +1,4 @@
+/* Base styling */
 body {
   font-family: Arial, sans-serif;
   margin: 2rem;
@@ -6,6 +7,7 @@ body {
 
 h1 {
   color: #222;
+  text-align: center;
 }
 
 textarea, input, button {
@@ -37,6 +39,7 @@ textarea {
   margin: 0 3px;
 }
 
+/* Summary Table */
 .summary-table {
   margin-top: 20px;
   border-collapse: collapse;
@@ -63,6 +66,7 @@ textarea {
   height: 200px; /* Bigger box */
 }
 
+/* Button Styling */
 button {
   background-color: #4CAF50; /* Green */
   color: white;
@@ -75,6 +79,31 @@ button:hover {
   background-color: #45a049;
 }
 
+/* Keyword Box Colors (Shaded) */
+#tableKeywords-box textarea {
+  background-color: #FFFF00;  /* Yellow */
+  color: #222;
+}
+
+#lsiKeywords-box textarea {
+  background-color: #98C7E4;  /* Light Blue */
+  color: #222;
+}
+
+#sectionKeywords-box textarea {
+  background-color: #D1F7A1;  /* Light Green */
+  color: #222;
+}
+
+/* Button Hover Colors */
+#runButton:hover {
+  background-color: #45a049;  /* Green */
+}
+
+#copyButton:hover {
+  background-color: #9b59b6; /* Purple */
+}
+
 h2 {
   margin-top: 30px;
   color: #444;
@@ -84,15 +113,19 @@ h2 {
   background-color: #f2f2f2;
 }
 
-/* Add styling for each keyword type's color */
-#tableKeywords {
-  background-color: #FFD700;  /* Gold */
+button#runButton {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
 }
 
-#lsiKeywords {
-  background-color: #98C7E4;  /* Light Blue */
-}
-
-#sectionKeywords {
-  background-color: #D1F7A1;  /* Light Green */
+button#copyButton {
+  background-color: #4CAF50; /* Green */
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-top: 10px;
 }
