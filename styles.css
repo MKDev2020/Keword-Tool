@@ -58,7 +58,7 @@ textarea {
   border-radius: 2px;
 }
 
-/* New styles to highlight sections */
+/* Larger text areas */
 textarea {
   height: 200px; /* Bigger box */
 }
@@ -82,4 +82,17 @@ h2 {
 
 .summary-table th {
   background-color: #f2f2f2;
+}
+
+/* Add styling for each keyword type's color */
+#tableKeywords {
+  background-color: #FFD700;  /* Gold */
+}
+
+#lsiKeywords {
+  background-color: #98C7E4;  /* Light Blue */
+}
+
+#sectionKeywords {
+  background-color: #D1F7A1;  /* Light Green */
 }
