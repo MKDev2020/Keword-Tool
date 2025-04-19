@@ -1,89 +1,100 @@
-body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f5f6fa;
-  margin: 0;
-  padding: 20px;
-  color: #2f3640;
+const colors = [
+  "#fbc531", "#4cd137", "#00a8ff", "#9c88ff", "#e84118",
+  "#00cec9", "#fab1a0", "#74b9ff", "#e84393", "#a29bfe"
+];
+
+let keywordColors = {};
+let colorIndex = 0;
+
+function getColorForKeyword(keyword) {
+  if (!keywordColors[keyword]) {
+    keywordColors[keyword] = colors[colorIndex % colors.length];
+    colorIndex++;
+  }
+  return keywordColors[keyword];
 }
 
-h1 {
-  text-align: center;
-  color: #353b48;
-  margin-bottom: 10px;
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+function highlightText() {
+  const article = document.getElementById("articleInput").value;
+  const mainKws = document.getElementById("mainKeywords").value.trim().split("\n").filter(Boolean);
+  const lsiKws = document.getElementById("lsiKeywords").value.trim().split("\n").filter(Boolean);
+  const sectionKws = document.getElementById("sectionKeywords").value.trim().split("\n").filter(Boolean);
+
+  let output = article;
+
+  keywordColors = {};
+  colorIndex = 0;
+
+  const allKeywords = [];
+
+  mainKws.forEach(kw => {
+    const color = getColorForKeyword(kw);
+    const regex = new RegExp(`\\b(${escapeRegExp(kw)})\\b`, "gi");
+    output = output.replace(regex, `<span class="highlight" style="background-color:${color}">$1</span>`);
+    allKeywords.push({ type: "Main", kw, color });
+  });
+
+  lsiKws.forEach(kw => {
+    const color = "#dcd6f7";
+    const regex = new RegExp(`\\b(${escapeRegExp(kw)})\\b`, "gi");
+    output = output.replace(regex, `<span class="highlight" style="background-color:${color}">$1</span>`);
+    allKeywords.push({ type: "LSI", kw, color });
+  });
+
+  sectionKws.forEach(kw => {
+    const regex = new RegExp(`\\b(${escapeRegExp(kw)})\\b`, "gi");
+    output = output.replace(regex, `<span class="bolded">$1</span>`);
+    allKeywords.push({ type: "Section", kw, color: "bold" });
+  });
+
+  document.getElementById("output").innerHTML = output;
+  renderLegend(allKeywords);
 }
 
-textarea {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  resize: vertical;
-  font-size: 15px;
-  min-height: 120px;
+function renderLegend(keywords) {
+  const legendContainer = document.getElementById("legend");
+  legendContainer.innerHTML = "";
+
+  // Remove duplicates
+  const unique = [];
+  keywords.forEach(({ type, kw, color }) => {
+    if (!unique.find(k => k.kw === kw)) {
+      unique.push({ type, kw, color });
+    }
+  });
+
+  // Sort by type: Main → LSI → Section
+  const typeOrder = { "Main": 0, "LSI": 1, "Section": 2 };
+  unique.sort((a, b) => typeOrder[a.type] - typeOrder[b.type]);
+
+  unique.forEach(({ kw, color }) => {
+    const legendItem = document.createElement("div");
+    legendItem.className = "legend-item";
+
+    const colorBox = document.createElement("div");
+    colorBox.className = "color-box";
+    colorBox.style.background = (color === "bold") ? "#2f3640" : color;
+
+    const label = document.createElement("span");
+    label.textContent = kw;
+
+    legendItem.appendChild(colorBox);
+    legendItem.appendChild(label);
+
+    legendContainer.appendChild(legendItem);
+  });
 }
 
-label {
-  font-weight: bold;
-  display: block;
-  margin: 10px 0 5px;
-}
-
-button {
-  background-color: #40739e;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  margin: 10px 5px 20px 0;
-  border-radius: 6px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-button:hover {
-  background-color: #2f3640;
-}
-
-.highlight {
-  padding: 2px 4px;
-  border-radius: 3px;
-  font-weight: bold;
-}
-
-.bolded {
-  font-weight: bold;
-}
-
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 15px 0;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 8px;
-  border-radius: 5px;
-  background-color: #f1f2f6;
-  font-size: 14px;
-}
-
-.color-box {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  border: 1px solid #dcdde1;
+function copyToClipboard() {
+  const el = document.createElement("textarea");
+  el.value = document.getElementById("output").innerHTML;
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
+  alert("HTML copied! Paste into a Google Doc using Ctrl+Shift+V for clean formatting.");
 }
