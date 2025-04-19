@@ -7,7 +7,6 @@ body {
 }
 
 #toolName {
-  text-align: center;
   font-size: 2rem; /* Larger title size */
   margin-bottom: 1rem;
 }
@@ -30,8 +29,18 @@ body {
   margin-bottom: 20px;
 }
 
-#tableKeywords, #lsiKeywords, #sectionKeywords {
+.keyword-box {
   width: 32%; /* Each keyword box gets roughly one-third of the row */
+}
+
+.keyword-box h2 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  text-align: left; /* Align labels to the left */
+}
+
+#tableKeywords, #lsiKeywords, #sectionKeywords {
+  width: 100%;
   height: 300px; /* Keep the height same for each box */
   resize: both; /* Allow resizing from bottom-right */
   overflow: auto;
