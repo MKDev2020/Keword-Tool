@@ -11,10 +11,6 @@
       background: #f9f9f9;
     }
 
-    h1 {
-      color: #222;
-    }
-
     textarea, input, button {
       width: 100%;
       margin: 10px 0;
@@ -22,11 +18,14 @@
       font-size: 16px;
     }
 
+    h2 {
+      margin-top: 2rem;
+    }
+
     #output {
       border: 1px solid #ccc;
       background: #fff;
       padding: 1rem;
-      margin-top: 20px;
       white-space: pre-wrap;
     }
 
@@ -39,11 +38,13 @@
     .summary-table {
       margin-top: 20px;
       border-collapse: collapse;
+      width: 100%;
     }
 
     .summary-table th, .summary-table td {
       border: 1px solid #ccc;
       padding: 8px;
+      text-align: left;
     }
 
     .color-box {
@@ -58,11 +59,18 @@
 </head>
 <body>
   <h1>Keyword Highlighter Tool</h1>
+
   <label>Paste your article here:</label>
   <textarea id="article" rows="10"></textarea>
 
-  <label>Enter keywords (one per line):</label>
-  <textarea id="keywords" rows="6"></textarea>
+  <label>Enter Table Keywords (yellow):</label>
+  <textarea id="tableKeywords" rows="4"></textarea>
+
+  <label>Enter LSI Keywords (blue):</label>
+  <textarea id="lsiKeywords" rows="4"></textarea>
+
+  <label>Enter Section-Specific Keywords (green):</label>
+  <textarea id="sectionKeywords" rows="4"></textarea>
 
   <button onclick="highlightKeywords()">Run</button>
 
@@ -74,36 +82,31 @@
 
   <script>
     function highlightKeywords() {
-      const article = document.getElementById('article').value;
-      const rawKeywords = document.getElementById('keywords').value
-        .split('\n')
-        .map(k => k.trim().toLowerCase())
-        .filter(k => k);
+      const articleText = document.getElementById('article').value;
+      const totalWords = articleText.trim().split(/\s+/).length;
 
-      const sortedKeywords = [...rawKeywords].sort((a, b) => b.length - a.length);
-      const usedSpans = [];
-      const keywordColors = {};
-      const summary = {};
+      const getKeywords = (id, type, color) => {
+        return document.getElementById(id).value
+          .split('\n')
+          .map(kw => kw.trim().toLowerCase())
+          .filter(Boolean)
+          .map(kw => ({ kw, type, color }));
+      };
 
-      function getRandomColor() {
-        const hue = Math.floor(Math.random() * 360);
-        return `hsl(${hue}, 80%, 80%)`;
-      }
+      const keywords = [
+        ...getKeywords('tableKeywords', 'Table', '#ffff99'),
+        ...getKeywords('lsiKeywords', 'LSI', '#b3d9ff'),
+        ...getKeywords('sectionKeywords', 'Section-specific', '#b3ffcc')
+      ];
 
-      let workingText = ` ${article} `;
+      const sortedKeywords = [...keywords].sort((a, b) => b.kw.length - a.kw.length);
+
+      let workingText = ` ${articleText} `;
       const placeholders = [];
-
-      // Create a map of keyword occurrences
-      const keywordOccurrences = rawKeywords.reduce((acc, kw) => {
-        acc[kw] = 0;
-        return acc;
-      }, {});
+      const keywordCounts = {};
 
       for (let i = 0; i < sortedKeywords.length; i++) {
-        const kw = sortedKeywords[i];
-        const color = getRandomColor();
-        keywordColors[kw] = color;
-
+        const { kw, type, color } = sortedKeywords[i];
         const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
         let match;
 
@@ -111,21 +114,21 @@
           const placeholder = `{{kw${placeholders.length}}}`;
           placeholders.push({
             placeholder,
-            keyword: match[0],
-            color,
             original: match[0],
+            keyword: kw,
+            type,
+            color,
             start: match.index
           });
 
-          workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + match[0].length);
+          workingText = workingText.slice(0, match.index) + placeholder + workingText.slice(match.index + match[0].length);
           pattern.lastIndex = match.index + placeholder.length;
 
-          // Count the non-overlapping occurrences of the keyword
-          keywordOccurrences[kw] += 1;
+          keywordCounts[kw] = (keywordCounts[kw] || 0) + 1;
         }
       }
 
-      // Replace placeholders with spans
+      // Replace placeholders with highlighted spans
       placeholders.sort((a, b) => a.start - b.start);
       for (let p of placeholders) {
         workingText = workingText.replace(
@@ -137,11 +140,29 @@
       document.getElementById('output').innerHTML = workingText.trim();
 
       // Build summary table
-      let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
-      for (let kw of rawKeywords) {
-        const count = keywordOccurrences[kw] || 0;
-        const color = keywordColors[kw] || "#eee";
-        tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
+      let tableHTML = `<tr>
+        <th>Keyword</th>
+        <th>Count</th>
+        <th>Density</th>
+        <th>Type</th>
+        <th>Color</th>
+      </tr>`;
+
+      const seen = new Set();
+      for (let { kw, type, color } of sortedKeywords) {
+        if (seen.has(kw)) continue;
+        seen.add(kw);
+
+        const count = keywordCounts[kw] || 0;
+        const density = totalWords ? ((count / totalWords) * 100).toFixed(2) + '%' : '0%';
+
+        tableHTML += `<tr>
+          <td>${kw}</td>
+          <td>${count}</td>
+          <td>${density}</td>
+          <td>${type}</td>
+          <td><span class="color-box" style="background:${color}"></span></td>
+        </tr>`;
       }
 
       document.getElementById('summary').innerHTML = tableHTML;
