@@ -18,7 +18,7 @@ function highlightKeywords() {
 
   // Define specific colors for each type of keyword list
   const keywordColors = {
-    table: '#FFD700',  // Gold for Table Keywords
+    table: '#FFD700',  // Yellow for Table Keywords
     lsi: '#98C7E4',    // Light Blue for LSI Keywords
     section: '#D1F7A1' // Light Green for Section Keywords
   };
@@ -29,8 +29,14 @@ function highlightKeywords() {
     section: {}
   };
 
+  function escapeRegExp(string) {
+    // Escape any special characters that could break the regex
+    return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
+  }
+
   function highlightKeyword(kw, color) {
-    const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+    const escapedKeyword = escapeRegExp(kw);
+    const pattern = new RegExp(`(?<!\\w)${escapedKeyword}(?!\\w)`, 'gi');
     return (text) => {
       return text.replace(pattern, `<span class="keyword" style="background-color:${color}">${kw}</span>`);
     };
