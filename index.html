@@ -61,8 +61,14 @@
   <label>Paste your article here:</label>
   <textarea id="article" rows="10"></textarea>
 
-  <label>Enter keywords (one per line):</label>
-  <textarea id="keywords" rows="6"></textarea>
+  <label>Enter Table Keywords (one per line):</label>
+  <textarea id="tableKeywords" rows="6"></textarea>
+
+  <label>Enter LSI Keywords (one per line):</label>
+  <textarea id="lsiKeywords" rows="6"></textarea>
+
+  <label>Enter Section-Specific Keywords (one per line):</label>
+  <textarea id="sectionKeywords" rows="6"></textarea>
 
   <button onclick="highlightKeywords()">Highlight Keywords</button>
 
@@ -75,12 +81,23 @@
   <script>
     function highlightKeywords() {
       const article = document.getElementById('article').value;
-      const rawKeywords = document.getElementById('keywords').value
+      
+      const tableKeywords = document.getElementById('tableKeywords').value
+        .split('\n')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k);
+        
+      const lsiKeywords = document.getElementById('lsiKeywords').value
+        .split('\n')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k);
+        
+      const sectionKeywords = document.getElementById('sectionKeywords').value
         .split('\n')
         .map(k => k.trim().toLowerCase())
         .filter(k => k);
 
-      const sortedKeywords = [...rawKeywords].sort((a, b) => b.length - a.length);
+      const sortedKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
       const usedSpans = [];
       const keywordColors = {};
       const summary = {};
@@ -93,8 +110,10 @@
       let workingText = ` ${article} `;
       const placeholders = [];
 
-      for (let i = 0; i < sortedKeywords.length; i++) {
-        const kw = sortedKeywords[i];
+      const allKeywords = [...tableKeywords, ...lsiKeywords, ...sectionKeywords];
+
+      for (let i = 0; i < allKeywords.length; i++) {
+        const kw = allKeywords[i];
         const color = getRandomColor();
         keywordColors[kw] = color;
 
@@ -131,7 +150,7 @@
 
       // Build summary table
       let tableHTML = "<tr><th>Keyword</th><th>Count</th><th>Color</th></tr>";
-      for (let kw of rawKeywords) {
+      for (let kw of sortedKeywords) {
         const count = summary[kw] || 0;
         const color = keywordColors[kw] || "#eee";
         tableHTML += `<tr><td>${kw}</td><td>${count}</td><td><span class="color-box" style="background:${color}"></span></td></tr>`;
