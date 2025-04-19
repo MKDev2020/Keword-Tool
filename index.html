@@ -20,6 +20,7 @@
       margin: 10px 0;
       padding: 10px;
       font-size: 16px;
+      border-radius: 4px;
     }
 
     #output {
@@ -53,6 +54,19 @@
       margin-right: 6px;
       vertical-align: middle;
       border-radius: 2px;
+    }
+
+    /* Add background shades to the keyword input boxes */
+    #tableKeywords {
+      background-color: #FFD700; /* Gold for Table Keywords */
+    }
+
+    #lsiKeywords {
+      background-color: #98C7E4; /* Light Blue for LSI Keywords */
+    }
+
+    #sectionKeywords {
+      background-color: #D1F7A1; /* Light Green for Section Keywords */
     }
   </style>
 </head>
@@ -111,10 +125,16 @@
       };
 
       function highlightKeyword(kw, color) {
-        const pattern = new RegExp(`(?<!\\w)${kw}(?!\\w)`, 'gi');
+        // Use the exact phrase matching for multi-word keywords
+        const pattern = new RegExp(`(?<!\\w)${escapeRegExp(kw)}(?!\\w)`, 'gi');
         return (text) => {
           return text.replace(pattern, `<span class="keyword" style="background-color:${color}">${kw}</span>`);
         };
+      }
+
+      function escapeRegExp(str) {
+        // Escape special characters for RegExp
+        return str.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, "\\$&");
       }
 
       let workingText = ` ${article} `;
