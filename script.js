@@ -1,66 +1,56 @@
-// JavaScript for Keyword Tool by MK
+document.getElementById("analyzeBtn").addEventListener("click", function() {
+    // Get the input article text and keywords
+    let articleText = document.getElementById("articleInput").value;
+    let tableKW = document.getElementById("tableKW").value.split("\n");
+    let lsiKW = document.getElementById("lsiKW").value.split("\n");
+    let sectionKW = document.getElementById("sectionKW").value.split("\n");
 
-// Utility function to escape regex characters
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-// Update output and generate keyword summary
-function analyzeText() {
-  const article = document.getElementById("articleInput").value;
-  const tableKeywords = document.getElementById("tableKeywords").value.split(',').map(kw => kw.trim()).filter(Boolean);
-  const lsiKeywords = document.getElementById("lsiKeywords").value.split(',').map(kw => kw.trim()).filter(Boolean);
-  const sectionKeywords = document.getElementById("sectionKeywords").value.split(',').map(kw => kw.trim()).filter(Boolean);
-
-  let output = article;
-
-  // Function to highlight keywords
-  function highlightKeywords(keywords, className) {
-    for (let keyword of keywords) {
-      const regex = new RegExp(`\\b${escapeRegExp(keyword)}\\b`, 'gi');
-      output = output.replace(regex, match => `<span class="highlight ${className}">${match}</span>`);
+    // Function to count occurrences of a keyword (non-overlapping)
+    function countOccurrences(text, keyword) {
+        let regex = new RegExp("\\b" + keyword + "\\b", "gi");
+        return (text.match(regex) || []).length;
     }
-  }
 
-  highlightKeywords(tableKeywords, 'table');
-  highlightKeywords(lsiKeywords, 'lsi');
-  highlightKeywords(sectionKeywords, 'section');
+    // Results container
+    let results = "";
 
-  document.getElementById("output").innerHTML = output;
+    // Analyze for table keywords
+    tableKW.forEach(kw => {
+        let count = countOccurrences(articleText, kw);
+        results += `<p><span class="highlight yellow">${kw}</span>: ${count} occurrences</p>`;
+    });
 
-  // Generate keyword summary
-  generateSummary(article, tableKeywords, lsiKeywords, sectionKeywords);
-}
+    // Analyze for LSI keywords
+    lsiKW.forEach(kw => {
+        let count = countOccurrences(articleText, kw);
+        results += `<p><span class="highlight purple">${kw}</span>: ${count} occurrences</p>`;
+    });
 
-function generateSummary(article, tableKWs, lsiKWs, sectionKWs) {
-  let summary = "<h3>Keyword Summary</h3>";
-  const totalWords = article.trim().split(/\s+/).length;
+    // Analyze for section-specific keywords
+    sectionKW.forEach(kw => {
+        let count = countOccurrences(articleText, kw);
+        results += `<p><span class="highlight bold">${kw}</span>: ${count} occurrences</p>`;
+    });
 
-  function countKeyword(keyword, text) {
-    const regex = new RegExp(`\\b${escapeRegExp(keyword)}\\b`, 'gi');
-    return (text.match(regex) || []).length;
-  }
+    // Display the results
+    document.getElementById("kwResult").innerHTML = results;
 
-  function buildList(name, kws) {
-    if (!kws.length) return "";
-    let html = `<strong>${name}</strong><ul>`;
-    for (let kw of kws) {
-      const count = countKeyword(kw, article);
-      const density = ((count / totalWords) * 100).toFixed(2);
-      html += `<li>${kw} - Count: ${count}, Density: ${density}%</li>`;
-    }
-    html += "</ul>";
-    return html;
-  }
+    // Update the keyword density
+    let totalWords = articleText.split(/\s+/).length;
+    let totalKeywords = tableKW.concat(lsiKW, sectionKW);
+    let totalKWCount = totalKeywords.reduce((acc, kw) => acc + countOccurrences(articleText, kw), 0);
+    let density = ((totalKWCount / totalWords) * 100).toFixed(2);
+    document.getElementById("kwResult").innerHTML += `<p>Keyword Density: ${density}%</p>`;
+});
 
-  summary += buildList("Table Keywords", tableKWs);
-  summary += buildList("LSI Keywords", lsiKWs);
-  summary += buildList("Section-Specific Keywords", sectionKWs);
-
-  document.getElementById("summary").innerHTML = summary;
-}
-
-// Event listener
-window.onload = () => {
-  document.getElementById("analyzeBtn").addEventListener("click", analyzeText);
-};
+// Copy to clipboard functionality
+document.getElementById("copyToClipboard").addEventListener("click", function() {
+    let textToCopy = document.getElementById("kwResult").innerText;
+    let textArea = document.createElement("textarea");
+    textArea.value = textToCopy;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+    alert("Results copied to clipboard!");
+});
