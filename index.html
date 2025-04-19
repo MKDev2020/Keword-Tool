@@ -1,104 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Keyword Highlighter</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; line-height: 1.6; }
-    textarea, input, button { width: 100%; margin-bottom: 15px; padding: 10px; font-size: 16px; }
-    #output { padding: 15px; border: 1px solid #ccc; min-height: 150px; white-space: pre-wrap; }
-    .highlight { padding: 2px 4px; border-radius: 4px; color: #000; }
-    #legend { margin-top: 20px; }
-    .legend-item { margin-bottom: 5px; display: inline-block; margin-right: 10px; padding: 4px 8px; border-radius: 4px; color: #000; }
-    #summary { margin-top: 30px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keyword Tool by MK</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Keyword Highlighter Tool</h1>
-  <label for="article">Paste your article:</label>
-  <textarea id="article" rows="10"></textarea>
+  <div class="container">
+    <header>
+      <h1>Keyword Tool by MK</h1>
+    </header>
 
-  <label for="keywords">Enter keywords (one per line):</label>
-  <textarea id="keywords" rows="5"></textarea>
+    <section class="inputs">
+      <div class="input-group">
+        <label for="mainKws">Main Table Keywords (highlighted yellow)</label>
+        <textarea id="mainKws" placeholder="Enter one keyword per line..."></textarea>
+      </div>
 
-  <button onclick="highlightKeywords()">Highlight Keywords</button>
+      <div class="input-group">
+        <label for="lsiKws">LSI Keywords (highlighted light purple)</label>
+        <textarea id="lsiKws" placeholder="Enter one keyword per line..."></textarea>
+      </div>
 
-  <div id="output"></div>
+      <div class="input-group">
+        <label for="sectionKws">Section-Specific Keywords (bolded)</label>
+        <textarea id="sectionKws" placeholder="Enter one keyword per line..."></textarea>
+      </div>
 
-  <div id="legend"></div>
+      <div class="input-group">
+        <label for="articleText">Paste Article Here:</label>
+        <textarea id="articleText" placeholder="Paste your article text here..."></textarea>
+      </div>
 
-  <div id="summary">
-    <h2>Keyword Summary</h2>
-    <table>
-      <thead>
-        <tr><th>Keyword</th><th>Count</th></tr>
-      </thead>
-      <tbody id="summary-body"></tbody>
-    </table>
+      <button id="highlightBtn">Highlight Keywords</button>
+      <button id="copyBtn">Copy to Clipboard</button>
+    </section>
+
+    <section class="results">
+      <h2>Highlighted Article</h2>
+      <div id="output" class="output"></div>
+    </section>
+
+    <section class="summary">
+      <h2>Keyword Summary</h2>
+      <div id="summary"></div>
+    </section>
   </div>
 
-  <script>
-    function generateDistinctColors(n) {
-      const colors = [];
-      const hueStep = 360 / n;
-      for (let i = 0; i < n; i++) {
-        const hue = Math.floor(i * hueStep);
-        const saturation = 70 + Math.random() * 20; // 70–90%
-        const lightness = 45 + Math.random() * 10;  // 45–55%
-        colors.push(`hsl(${hue}, ${saturation}%, ${lightness}%)`);
-      }
-      return colors;
-    }
-
-    function highlightKeywords() {
-      const articleText = document.getElementById('article').value.toLowerCase();
-      let keywords = document.getElementById('keywords').value
-        .split('\n')
-        .map(k => k.trim().toLowerCase())
-        .filter(k => k);
-
-      // Sort keywords by length (longest first to avoid overlaps)
-      keywords.sort((a, b) => b.length - a.length);
-
-      const colors = generateDistinctColors(keywords.length);
-      const colorMap = {};
-      const summary = {};
-      let workingText = ` ${articleText} `; // Padding to help match boundaries
-
-      for (let i = 0; i < keywords.length; i++) {
-        const keyword = keywords[i];
-        const color = colors[i];
-        colorMap[keyword] = color;
-
-        const pattern = new RegExp(`(?<!\\w)${keyword.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}(?!\\w)`, 'gi');
-        const matches = [...workingText.matchAll(pattern)];
-
-        summary[keyword] = matches.length;
-
-        workingText = workingText.replace(pattern, match => {
-          return `<span class="highlight" style="background-color:${color};">${match}</span>`;
-        });
-      }
-
-      document.getElementById('output').innerHTML = workingText.trim();
-
-      // Legend
-      let legendHTML = '<h3>Keyword Legend</h3>';
-      for (const keyword of keywords) {
-        legendHTML += `<div class="legend-item" style="background-color:${colorMap[keyword]};">${keyword}</div>`;
-      }
-      document.getElementById('legend').innerHTML = legendHTML;
-
-      // Summary Table
-      let summaryHTML = '';
-      for (const keyword of keywords) {
-        summaryHTML += `<tr><td>${keyword}</td><td>${summary[keyword]}</td></tr>`;
-      }
-      document.getElementById('summary-body').innerHTML = summaryHTML;
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
