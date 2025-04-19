@@ -41,18 +41,11 @@ button {
   font-size: 18px;
   border-radius: 5px;
   transition: background-color 0.3s ease; /* Smooth transition for hover */
-}
-
-button#runButton {
-  background-color: #C0C0C0; /* Shiny Silver for static color */
+  padding: 15px; /* Make buttons larger */
 }
 
 button#runButton:hover {
   background-color: #45a049;  /* Green for Run button hover */
-}
-
-button#copyButton {
-  background-color: #C0C0C0; /* Shiny Silver for static color */
 }
 
 button#copyButton:hover {
@@ -61,4 +54,48 @@ button#copyButton:hover {
 
 button:focus {
   outline: none;
+}
+
+/* Section Styles for each Keyword */
+#tableKeywords {
+  background-color: #FFD700;  /* Yellow */
+}
+
+#lsiKeywords {
+  background-color: #98C7E4;  /* Light Blue */
+}
+
+#sectionKeywords {
+  background-color: #D1F7A1;  /* Light Green */
+}
+
+/* Summary Table Styles */
+.summary-table {
+  margin-top: 20px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.summary-table th, .summary-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.summary-table th {
+  background-color: #f2f2f2;
+}
+
+.color-box {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
+/* Larger text areas */
+textarea {
+  height: 200px; /* Bigger box */
 }
