@@ -9,40 +9,50 @@
 <body>
     <div class="container">
         <h1>Keyword Tool by MK</h1>
-        <div class="keyword-inputs">
-            <textarea id="articleInput" placeholder="Paste your article here..."></textarea>
 
-            <div class="kw-boxes">
-                <div class="kw-box">
-                    <h3>Table Keywords</h3>
-                    <textarea id="tableKW" placeholder="Enter table keywords..."></textarea>
-                </div>
-                <div class="kw-box">
-                    <h3>LSI Keywords</h3>
-                    <textarea id="lsiKW" placeholder="Enter LSI keywords..."></textarea>
-                </div>
-                <div class="kw-box">
-                    <h3>Section-Specific Keywords</h3>
-                    <textarea id="sectionKW" placeholder="Enter section-specific keywords..."></textarea>
-                </div>
-            </div>
-            
-            <button id="analyzeBtn">Analyze</button>
-
-            <div id="keywordSummary" class="summary">
-                <h3>Keyword Summary</h3>
-                <p id="kwResult">Results will appear here...</p>
-            </div>
-
-            <div id="legend" class="legend">
-                <h3>Keyword Legend</h3>
-                <p><span class="highlight yellow"></span> Table Keyword</p>
-                <p><span class="highlight purple"></span> LSI Keyword</p>
-                <p><span class="highlight bold"></span> Section-Specific Keyword</p>
-            </div>
-
-            <button id="copyToClipboard">Copy Results</button>
+        <!-- Article Input -->
+        <div class="section">
+            <label for="articleInput">Paste your article here:</label>
+            <textarea id="articleInput" placeholder="Paste your article..." rows="10"></textarea>
         </div>
+
+        <!-- Keywords Input -->
+        <div class="keyword-inputs">
+            <div class="kw-box">
+                <label for="tableKW">Table Keywords (Enter one per line):</label>
+                <textarea id="tableKW" placeholder="Enter table keywords..."></textarea>
+            </div>
+
+            <div class="kw-box">
+                <label for="lsiKW">LSI Keywords (Enter one per line):</label>
+                <textarea id="lsiKW" placeholder="Enter LSI keywords..."></textarea>
+            </div>
+
+            <div class="kw-box">
+                <label for="sectionKW">Section-Specific Keywords (Enter one per line):</label>
+                <textarea id="sectionKW" placeholder="Enter section-specific keywords..."></textarea>
+            </div>
+        </div>
+
+        <!-- Analyze Button -->
+        <button id="analyzeBtn">Analyze</button>
+
+        <!-- Keyword Summary -->
+        <div id="keywordSummary" class="summary">
+            <h3>Keyword Summary</h3>
+            <p id="kwResult">Results will appear here...</p>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h3>Keyword Legend</h3>
+            <p><span class="highlight yellow"></span> Table Keyword</p>
+            <p><span class="highlight purple"></span> LSI Keyword</p>
+            <p><span class="highlight bold"></span> Section-Specific Keyword</p>
+        </div>
+
+        <!-- Copy Button -->
+        <button id="copyToClipboard">Copy Results</button>
     </div>
 
     <script src="script.js"></script>
